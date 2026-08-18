@@ -112,7 +112,9 @@ body {
 
 @media (min-width: 768px) {
   .tl {
-    grid-template-columns: minmax(0, 1fr) 3.5rem minmax(0, 1fr);
+    /* Projects lead and get the wider column — they are the point of the page.
+       Roles are supporting context, so they take the narrower one. */
+    grid-template-columns: minmax(0, 1.7fr) 3.5rem minmax(0, 1fr);
     column-gap: 0;
     align-items: start;
   }
@@ -141,12 +143,12 @@ body {
   }
 
   .tl-role {
-    grid-column: 1;
+    grid-column: 3;
     /* The bar spans its whole duration — that span is the point of the layout. */
     grid-row: var(--row-start) / var(--row-end);
     position: relative;
     margin: 0;
-    padding: 0.5rem 2rem 1.5rem 0;
+    padding: 0.5rem 0 1.5rem 2rem;
     align-self: stretch;
     display: flex;
   }
@@ -158,7 +160,7 @@ body {
     display: block;
     position: absolute;
     top: 0.75rem;
-    right: 0.75rem;
+    left: 0.75rem;
     bottom: 0.75rem;
     width: 2px;
     border-radius: 1px;
@@ -200,14 +202,17 @@ body {
   }
 
   .tl-project {
-    grid-column: 3;
+    grid-column: 1;
     grid-row: var(--row);
-    padding: 0.5rem 0 1.5rem 1.75rem;
+    padding: 0.5rem 1.75rem 1.5rem 0;
   }
 
+  /* The dot sits on the inner edge, touching the axis, so each project is
+     visibly pinned to its point in time. */
   .tl-dot {
     top: 0.9rem;
-    left: -0.25rem;
+    left: auto;
+    right: -0.25rem;
   }
 }
 

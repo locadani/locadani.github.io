@@ -74,11 +74,15 @@ Experience block above it. That answered "what did they build" but left the read
 join two lists mentally to learn *when*. The two are now one two-column timeline sharing
 a single set of rows:
 
-- **Left column** — each role as a card with a vertical **rail whose length is the job's
-  real duration**, marked with start and end ticks. The card is sticky within its span,
-  so the job stays visible next to every project belonging to it.
-- **Centre column** — the year axis and a continuous spine.
-- **Right column** — projects, one per row, at their own dates.
+- **Left column, and the wider one (1.7fr)** — projects, one per row, at their own dates.
+  Projects are the focus of the page, so they get the space; each carries a dot on its
+  inner edge, pinned to the axis.
+- **Centre column** — the year axis and a continuous spine. Year labels sit on a paper
+  background so they punch through the spine rather than colliding with it.
+- **Right column (1fr)** — each role as a card with a vertical **rail whose length is the
+  job's real duration**, marked with start and end ticks, offset 40px from the axis so the
+  duration bars never read as part of the spine itself. The card is sticky within its
+  span, so the job stays visible beside every project belonging to it.
 
 The point is geometric rather than stated: a project built during a job physically sits
 beside that job's bar. It also surfaces something a two-list layout hides — that the Anki
@@ -361,3 +365,19 @@ What changed:
 
 What did not change: content, schemas, the technology registry, filter semantics, the
 build-time guards, and the decision to keep contact to LinkedIn and GitHub only.
+
+### 2026-08-18 — projects moved to the wider left column
+
+Roles and projects swapped sides at Daniele's request: *"I want the projects on the left
+with bigger space and the experience on the right. The projects are the focus here."*
+Columns are now 1.7fr / 1fr rather than equal, the page container widened to `max-w-6xl`,
+project dots moved to the inner edge, and role rails moved to the inner edge of the role
+column.
+
+### Employer work: described, never linked
+
+Confirmed with Daniele: the four employer projects are described on the site but link to
+no source, because that code is private. Only the eight public personal and university
+repositories carry links. `Smoky` has no link at all — the code lives in three private
+repositories owned by a collaborator, and the project also had an iOS client that the CV
+does not mention.
