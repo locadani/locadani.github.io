@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { chipsFor, groupChips } from '../lib/filter';
-import { layoutTimeline } from '../lib/timeline';
+import { layoutTimeline, roleCovers } from '../lib/timeline';
 import { formatRange, formatMonth } from '../lib/format';
 import { techName } from '../data/tech';
 
@@ -22,6 +22,25 @@ const chipGroups = groupChips(
   chipsFor(projectEntries.map((p) => ({ id: p.id, tech: p.data.tech }))),
 );
 const projectCount = projectEntries.length;
+
+/**
+ * Which organisation a project sits under. Filtering hides the role bars, so a
+ * surviving card has to carry its own context — otherwise "what was I doing when
+ * I built this" is lost exactly when the reader has narrowed down to it.
+ *
+ * A project with its own `org` uses it. Otherwise, if a role was held at that
+ * date, the card says so — which is how a personal project shows that it was
+ * built alongside a job.
+ */
+function contextFor(entry: (typeof projectEntries)[number]): string | undefined {
+  if (entry.data.org) return entry.data.org;
+  const covering = roleEntries.filter((r) =>
+    roleCovers({ id: r.id, start: r.data.start, end: r.data.end }, entry.data.start),
+  );
+  // Prefer an actual job over the degree, which spans years and would otherwise win.
+  const role = covering.find((r) => r.data.kind === 'role') ?? covering[0];
+  return role ? `while at ${role.data.org}` : undefined;
+}
 
 /** Work and personal lead; research and university fill out the early years. */
 const LEADING = new Set(['work', 'personal']);
@@ -73,8 +92,9 @@ const items = [
   >
     Projects &amp; career
   </h2>
-  {/* The caption has to be true in both layouts: there are no columns on a phone. */}
-  <p class="mt-2 max-w-2xl text-sm text-(--color-ink-faint)">
+  {/* The caption has to be true in every state: there are no columns on a phone,
+      and no role bars at all once a phone is filtered — hence tl-hint. */}
+  <p class="tl-hint mt-2 max-w-2xl text-sm text-(--color-ink-faint)">
     <span class="md:hidden">Each role, followed by what I built during it.</span>
     <span class="hidden md:inline"
       >What I built on the left, the role I held on the right — aligned, so you can
@@ -93,13 +113,16 @@ const items = [
         >
       </legend>
 
+      <!-- On a phone each category label takes its own line and its chips begin a
+           new row beneath it; side by side from md up. -->
       <div class="mt-4 space-y-2.5">
         {
           chipGroups.map((group) => (
-            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
-              <p class="w-24 shrink-0 font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
+            <div class="md:flex md:items-baseline md:gap-x-2">
+              <p class="font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint) md:w-24 md:shrink-0">
                 {group.label}
               </p>
+              <div class="mt-1.5 flex flex-wrap gap-1.5 md:mt-0">
               {group.chips.map((chip) => (
                 <div>
                   <input
@@ -125,6 +148,7 @@ const items = [
                   </label>
                 </div>
               ))}
+              </div>
             </div>
           ))
         }
@@ -254,6 +278,12 @@ const items = [
                 : formatMonth(entry.data.start)}
               <span class="mx-1.5 opacity-50">·</span>
               {CONTEXT_LABEL[entry.data.context]}
+              {contextFor(entry) && (
+                <>
+                  <span class="mx-1.5 opacity-50">·</span>
+                  {contextFor(entry)}
+                </>
+              )}
             </p>
 
             <div class="entry-body mt-2">
@@ -279,7 +309,7 @@ const items = [
     }
   </div>
 
-  <p class="mt-4 text-xs text-(--color-ink-faint)">
+  <p class="tl-hint mt-4 text-xs text-(--color-ink-faint)">
     {projectCount} projects · roles shown as bars spanning their dates
   </p>
 </section>

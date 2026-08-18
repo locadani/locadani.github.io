@@ -219,12 +219,20 @@ body {
 /* ---------------------------------------------------------------------------
    Timeline filter states.
 
-   The client script only ever sets two attributes: `data-filtering` on the
-   timeline root and `data-match` on each entry. Everything visual happens here,
-   which is why the filter needs no framework.
+   The script only ever sets `data-filtering` on the root and `data-match` per
+   entry; everything below is CSS. The behaviour deliberately differs by width:
+
+   - Wide screens dim and collapse non-matching entries to thin stubs. There is
+     room for the spine, and keeping the rows means the role bars still align
+     with the projects beside them.
+   - Phones remove them outright. A stub still costs a scroll, which is exactly
+     what filtering is meant to save — so the role bars, spine and year markers
+     go too, and each surviving card carries its own "Work · Backwell Tech Corp"
+     context instead.
    --------------------------------------------------------------------------- */
 
 .entry-body {
+  max-height: 60rem;
   transition:
     opacity 220ms ease,
     max-height 320ms ease,
@@ -235,8 +243,6 @@ body {
   opacity: 0.42;
 }
 
-/* Non-matching entries collapse to a thin stub: the spine and the sense of
-   chronology survive filtering, and nothing reflows out from under the reader. */
 [data-filtering='true'] [data-match='false'] .entry-body {
   max-height: 0;
   overflow: hidden;
@@ -256,8 +262,21 @@ body {
   transform: scale(1.15);
 }
 
-.entry-body {
-  max-height: 60rem;
+/* Phones: a results list, not a dimmed timeline. */
+@media (max-width: 767px) {
+  [data-filtering='true'] [data-match='false'],
+  [data-filtering='true'] .tl-role,
+  [data-filtering='true'] .tl-spine,
+  [data-filtering='true'] .tl-year {
+    display: none;
+  }
+
+  /* Both hints describe an unfiltered timeline — "each role, followed by what I
+     built during it" and "roles shown as bars". Once a phone is filtered there
+     are no roles and no bars on screen, so the lines would simply be untrue. */
+  section:has(.tl[data-filtering='true']) .tl-hint {
+    display: none;
+  }
 }
 
 .entry-dot {
@@ -303,7 +322,11 @@ body {
   .no-print {
     display: none !important;
   }
-  [data-filtering='true'] [data-match='false'] {
+  /* Print the whole timeline, never a filtered subset. */
+  [data-filtering='true'] [data-match='false'],
+  [data-filtering='true'] .tl-role,
+  [data-filtering='true'] .tl-year {
+    display: revert;
     opacity: 1;
   }
   [data-filtering='true'] [data-match='false'] .entry-body {

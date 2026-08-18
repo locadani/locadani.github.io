@@ -29,9 +29,10 @@ test('reveals the filter once scripting is available', async ({ page }) => {
   await expect(page.locator('[data-filter-form]')).toBeVisible();
 });
 
-test('selecting a technology collapses non-matching entries and updates the count', async ({
+test('on a wide screen, selecting a technology collapses non-matching entries', async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await chip(page, 'react').click();
 
@@ -53,7 +54,8 @@ test('selecting a technology collapses non-matching entries and updates the coun
   expect((await hitBody.boundingBox())!.height).toBeGreaterThan(0);
 });
 
-test('role bars are never dimmed or collapsed by filtering', async ({ page }) => {
+test('on a wide screen, role bars survive filtering', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   const roles = page.locator('.tl-role');
   const before = await roles.count();
@@ -151,4 +153,99 @@ test('Clear restores the full timeline and drops the URL parameter', async ({ pa
   await expect(page.locator(timeline)).toHaveAttribute('data-filtering', 'false');
   await expect(page.locator('[data-entry][data-match="true"]')).toHaveCount(15);
   await expect(page).not.toHaveURL(/tech=/);
+});
+
+
+test('on a phone, filtering removes non-matching entries instead of dimming them', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  await chip(page, 'react').click();
+
+  // A dimmed stub still costs a scroll, which is the thing being complained about.
+  const misses = page.locator('[data-entry][data-match="false"]');
+  const missCount = await misses.count();
+  expect(missCount).toBeGreaterThan(0);
+  for (let i = 0; i < missCount; i += 1) {
+    await expect(misses.nth(i)).toBeHidden();
+  }
+
+  // Role bars, spine and year markers go with them: with rows removed they would
+  // no longer line up with anything.
+  await expect(page.locator('.tl-role').first()).toBeHidden();
+  await expect(page.locator('.tl-year').first()).toBeHidden();
+
+  await expect(page.locator('[data-entry][data-match="true"]').first()).toBeVisible();
+});
+
+test('a phone card names the job it was built under, since the role bars are gone', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  await chip(page, 'react').click();
+
+  const first = page.locator('[data-entry][data-match="true"]').first();
+  await expect(first).toContainText('Backwell Tech Corp');
+
+  // A personal project states the job it was built alongside rather than an employer.
+  await page.getByRole('button', { name: 'Clear' }).click();
+  await chip(page, 'spring-boot').click();
+  const anki = page.locator('[data-entry][data-match="true"]').first();
+  await expect(anki).toContainText('Personal');
+  await expect(anki).toContainText('while at KPMG Italy');
+});
+
+test('filtering a phone leaves nothing to scroll past', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  const unfiltered = await page.evaluate(() => document.body.scrollHeight);
+
+  await chip(page, 'react').click();
+  await page.waitForTimeout(200);
+  const filtered = await page.evaluate(() => document.body.scrollHeight);
+
+  // The page must actually get shorter — the whole point of the change.
+  expect(filtered).toBeLessThan(unfiltered / 2);
+});
+
+test('on a phone each filter category label sits on its own row above its chips', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+
+  const label = page.locator('#tech-filter p', { hasText: 'Languages' }).first();
+  const firstChip = page.locator('label[for="tech-java"]');
+  const labelBox = (await label.boundingBox())!;
+  const chipBox = (await firstChip.boundingBox())!;
+
+  // The chip starts below the label, not beside it.
+  expect(chipBox.y).toBeGreaterThanOrEqual(labelBox.y + labelBox.height - 1);
+});
+
+
+test('a filtered phone hides the hints that describe the unfiltered timeline', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  const hints = page.locator('.tl-hint');
+  await expect(hints.first()).toBeVisible();
+
+  await chip(page, 'react').click();
+  // "each role, followed by what I built" and "roles shown as bars" are both
+  // false once the roles are gone from the screen.
+  const n = await hints.count();
+  for (let i = 0; i < n; i += 1) await expect(hints.nth(i)).toBeHidden();
+});
+
+test('a wide screen keeps its hints while filtering, because the bars are still there', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await chip(page, 'react').click();
+  await expect(page.locator('.tl-hint').first()).toBeVisible();
 });

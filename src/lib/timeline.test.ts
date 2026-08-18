@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { layoutTimeline, type RoleInput, type ProjectInput } from './timeline';
+import { layoutTimeline, roleCovers, type RoleInput, type ProjectInput } from './timeline';
 
 const role = (id: string, start: string, end?: string): RoleInput => ({ id, start, end });
 const project = (id: string, start: string): ProjectInput => ({ id, start });
@@ -119,5 +119,25 @@ describe('layoutTimeline', () => {
     expect(layoutTimeline(roles, projects)).toEqual(
       layoutTimeline([...roles].reverse(), [...projects].reverse()),
     );
+  });
+});
+
+describe('roleCovers', () => {
+  const job = role('job', '2024-10', '2025-10');
+  const ongoing = role('ongoing', '2025-11');
+
+  it('includes the start and end months themselves', () => {
+    expect(roleCovers(job, '2024-10')).toBe(true);
+    expect(roleCovers(job, '2025-10')).toBe(true);
+  });
+
+  it('excludes dates outside the range', () => {
+    expect(roleCovers(job, '2024-09')).toBe(false);
+    expect(roleCovers(job, '2025-11')).toBe(false);
+  });
+
+  it('treats a missing end as still running', () => {
+    expect(roleCovers(ongoing, '2099-01')).toBe(true);
+    expect(roleCovers(ongoing, '2025-10')).toBe(false);
   });
 });

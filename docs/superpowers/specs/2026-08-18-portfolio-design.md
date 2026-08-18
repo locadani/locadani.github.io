@@ -381,3 +381,25 @@ no source, because that code is private. Only the eight public personal and univ
 repositories carry links. `Smoky` has no link at all — the code lives in three private
 repositories owned by a collaborator, and the project also had an iOS client that the CV
 does not mention.
+
+### 2026-08-18 — filtering behaves differently on a phone
+
+On a phone a dimmed stub still costs a scroll, which defeats the point of filtering,
+so phones now remove non-matching entries outright — along with the role bars, spine
+and year markers, which would no longer align with anything once rows are gone.
+
+Wide screens keep the original dim-and-collapse: there is room for the spine, and the
+retained rows are what keep each role bar aligned with the projects beside it. The
+split is a single `max-width: 767px` media query.
+
+Because the role bars disappear on a filtered phone, **every project card now states the
+role it was built under** — `Work · Backwell Tech Corp`, or `Personal · while at KPMG
+Italy` for a side project built alongside a job. The "while at" relationship is derived
+from the same span data the columns are drawn from, via `roleCovers`, so the two can
+never disagree. The narrowest covering role wins, otherwise the multi-year degree would
+claim every university project.
+
+Two hint lines are hidden on a filtered phone, since they describe a timeline that is no
+longer on screen: the section caption and the "roles shown as bars" footnote.
+
+Filter category labels also take their own row above their chips on a phone.

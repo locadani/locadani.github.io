@@ -57,10 +57,17 @@ interface Slot {
 /** `YYYY-MM` strings compare correctly as strings, which is why the schema demands them. */
 const NEWEST_FIRST = (a: string, b: string) => b.localeCompare(a);
 
-function covers(role: RoleInput, date: string): boolean {
+/**
+ * Was this role held at that date? Exported because the filtered view hides the
+ * role bars, so each surviving project card has to state its own context — and
+ * that context is exactly "which role covered this project's date".
+ */
+export function roleCovers(role: RoleInput, date: string): boolean {
   if (date < role.start) return false;
   return role.end === undefined || date <= role.end;
 }
+
+const covers = roleCovers;
 
 export function layoutTimeline(
   roles: readonly RoleInput[],
