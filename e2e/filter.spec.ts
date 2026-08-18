@@ -249,3 +249,34 @@ test('a wide screen keeps its hints while filtering, because the bars are still 
   await chip(page, 'react').click();
   await expect(page.locator('.tl-hint').first()).toBeVisible();
 });
+
+
+test('a selected technology is highlighted on the cards that matched it', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await chip(page, 'react').click();
+
+  const match = page.locator('[data-entry][data-match="true"]').first();
+  const reactTag = match.locator("[data-tech-tag='react']");
+  const otherTag = match.locator("[data-tech-tag='typescript']");
+  const reactChip = page.locator('label[for="tech-react"]');
+
+  await expect(reactTag).toHaveAttribute('data-selected', 'true');
+  await expect(otherTag).toHaveAttribute('data-selected', 'false');
+
+  // toHaveCSS retries, which matters: these carry a 150ms transition and sampling
+  // getComputedStyle straight after the click reads a mid-fade colour.
+  const accent = 'oklch(0.48 0.15 258)';
+  await expect(reactTag).toHaveCSS('background-color', accent);
+
+  // The tag and the chip that selected it share one colour because they share one
+  // CSS rule — that is the property worth pinning down.
+  await expect(reactChip).toHaveCSS('background-color', accent);
+
+  // An unselected neighbour on the same card stays plain.
+  await expect(otherTag).not.toHaveCSS('background-color', accent);
+
+  await page.getByRole('button', { name: 'Clear' }).click();
+  await expect(reactTag).toHaveAttribute('data-selected', 'false');
+  await expect(reactTag).not.toHaveCSS('background-color', accent);
+});

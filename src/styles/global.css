@@ -293,9 +293,18 @@ body {
   }
   .entry-body,
   .entry-dot,
-  .chip {
+  .chip,
+  .tech-tag {
     transition: none;
   }
+}
+
+/* Matches the chip's own transition, so a tag and its chip light up together. */
+.tech-tag {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 }
 
 .chip {
@@ -312,10 +321,14 @@ body {
   outline-offset: 2px;
 }
 
-.chip-input:checked + .chip {
+/* The accent is defined once, here, for both the chip you select and the matching
+   tag on every card — so the eye connects "I picked React" to "this is the React on
+   this project", and there is one place to change the colour. */
+.chip-input:checked + .chip,
+.tech-tag[data-selected='true'] {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: white;
+  color: var(--color-paper);
 }
 
 @media print {

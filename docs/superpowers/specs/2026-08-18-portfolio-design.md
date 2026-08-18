@@ -403,3 +403,25 @@ Two hint lines are hidden on a filtered phone, since they describe a timeline th
 longer on screen: the section caption and the "roles shown as bars" footnote.
 
 Filter category labels also take their own row above their chips on a phone.
+
+### 2026-08-18 — the matching tag is highlighted on each card
+
+Selecting a technology now also highlights that technology's tag on every card, in the
+same accent as the chip, so the reader connects "I picked React" to "this is the React on
+this project".
+
+The accent is declared **once**, in a single rule shared by the chip and the tag:
+
+```css
+.chip-input:checked + .chip,
+.tech-tag[data-selected='true'] { background: var(--color-accent); ... }
+```
+
+A first attempt generated one `:has()` rule per technology — 42 selectors — which is
+exactly the repetition this avoids. The script instead sets `data-selected` on tags in one
+generic loop, matching how it already sets `data-match` on entries: attributes from
+script, appearance from CSS, one source of truth for the colour.
+
+Worth noting for future tests: the tags carry a 150ms transition, so reading
+`getComputedStyle` immediately after a click samples a mid-fade colour. The test uses
+Playwright's retrying `toHaveCSS` rather than a one-shot read.

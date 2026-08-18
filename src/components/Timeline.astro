@@ -85,7 +85,7 @@ const items = [
 });
 ---
 
-<section class="mx-auto max-w-6xl px-6 py-14" aria-labelledby="timeline-heading">
+<section id="timeline" class="mx-auto max-w-6xl px-6 py-14" aria-labelledby="timeline-heading">
   <h2
     id="timeline-heading"
     class="font-mono text-xs tracking-[0.18em] text-(--color-ink-faint) uppercase"
@@ -297,7 +297,10 @@ const items = [
 
               <ul class="mt-2.5 flex flex-wrap gap-1" aria-label="Technologies used">
                 {entry.data.tech.map((slug) => (
-                  <li class="rounded border border-(--color-rule-soft) bg-(--color-paper-sunk) px-1.5 py-0.5 font-mono text-[0.6875rem] text-(--color-ink-faint)">
+                  <li
+                    class="tech-tag rounded border border-(--color-rule-soft) bg-(--color-paper-sunk) px-1.5 py-0.5 font-mono text-[0.6875rem] text-(--color-ink-faint)"
+                    data-tech-tag={slug}
+                  >
                     {techName(slug)}
                   </li>
                 ))}

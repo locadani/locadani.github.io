@@ -28,6 +28,10 @@
     // The filter does nothing without JS, so it ships hidden and is revealed here.
     form.classList.remove('hidden');
 
+    // Every tech pill on every card, so a selected technology can be picked out
+    // within the cards that survived the filter.
+    const tags = [...timeline.querySelectorAll<HTMLElement>('[data-tech-tag]')];
+
     const apply = (selected: Set<string>, pushUrl: boolean) => {
       timeline.dataset.filtering = String(selected.size > 0);
 
@@ -36,6 +40,12 @@
         const isMatch = matches(entry, selected);
         entry.el.dataset.match = String(isMatch);
         if (isMatch) matched += 1;
+      }
+
+      // Show which tag earned the match. One generic loop — the accent itself is
+      // defined once in CSS, shared with the chip that selected it.
+      for (const tag of tags) {
+        tag.dataset.selected = String(selected.has(tag.dataset.techTag ?? ''));
       }
 
       if (countEl) {
