@@ -1,21 +1,26 @@
 {
-  "name": "particle",
+  "name": "locadani-portfolio",
+  "type": "module",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "dev": "gulp"
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "author": "Nathan Randecker",
-  "license": "ISC",
   "dependencies": {
-    "browser-sync": "^2.26.3",
-    "gulp": "^4.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-csso": "^3.0.1",
-    "gulp-imagemin": "^5.0.3",
-    "gulp-plumber": "^1.2.1",
-    "gulp-sass": "^4.0.2",
-    "gulp-uglify": "^3.0.1"
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/sitemap": "^3.7.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.2",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

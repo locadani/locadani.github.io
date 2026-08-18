@@ -1,0 +1,78 @@
+---
+/**
+ * The filter's only client-side code.
+ *
+ * It reads checkbox state, delegates the decision to the pure functions in
+ * lib/filter.ts, and writes two attributes — `data-filtering` on the root and
+ * `data-match` on each entry. All dimming and collapsing is CSS. That is why
+ * there is no framework here: the DOM work is genuinely this small.
+ */
+---
+
+<script>
+  import { matches, parseTechParam, serializeTechParam } from '../lib/filter';
+
+  const form = document.querySelector<HTMLFormElement>('[data-filter-form]');
+  const timeline = document.querySelector<HTMLElement>('[data-timeline]');
+  const countEl = document.querySelector<HTMLElement>('[data-filter-count]');
+  const resetEl = document.querySelector<HTMLElement>('[data-filter-reset]');
+
+  if (form && timeline) {
+    const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="tech"]')];
+    const entries = [...timeline.querySelectorAll<HTMLElement>('[data-entry]')].map((el) => ({
+      el,
+      id: el.dataset.tech ?? '',
+      tech: (el.dataset.tech ?? '').split(' ').filter(Boolean),
+    }));
+
+    // The filter does nothing without JS, so it ships hidden and is revealed here.
+    form.classList.remove('hidden');
+
+    const apply = (selected: Set<string>, pushUrl: boolean) => {
+      timeline.dataset.filtering = String(selected.size > 0);
+
+      let matched = 0;
+      for (const entry of entries) {
+        const isMatch = matches(entry, selected);
+        entry.el.dataset.match = String(isMatch);
+        if (isMatch) matched += 1;
+      }
+
+      if (countEl) {
+        countEl.textContent =
+          selected.size === 0
+            ? `${entries.length} projects`
+            : `${matched} of ${entries.length} match`;
+      }
+      resetEl?.classList.toggle('hidden', selected.size === 0);
+
+      if (pushUrl) {
+        const param = serializeTechParam(selected);
+        const url = new URL(window.location.href);
+        if (param) url.searchParams.set('tech', param);
+        else url.searchParams.delete('tech');
+        // Commas are legal in a query string, and URLSearchParams escapes them to
+        // %2C regardless. Put them back: this link gets pasted into messages, so
+        // `?tech=csharp,react` beats `?tech=csharp%2Creact`.
+        url.search = url.searchParams.toString().replace(/%2C/g, ',');
+        // replaceState, not pushState: filtering should not fill the back button.
+        window.history.replaceState({}, '', url);
+      }
+    };
+
+    const readSelection = () =>
+      new Set(boxes.filter((b) => b.checked).map((b) => b.value));
+
+    form.addEventListener('change', () => apply(readSelection(), true));
+
+    form.addEventListener('reset', () => {
+      // The reset event fires before the inputs clear, so defer a frame.
+      requestAnimationFrame(() => apply(readSelection(), true));
+    });
+
+    // Restore a shared link's filter state: ?tech=react,python
+    const fromUrl = parseTechParam(new URLSearchParams(window.location.search).get('tech'));
+    for (const box of boxes) box.checked = fromUrl.has(box.value);
+    apply(fromUrl, false);
+  }
+</script>

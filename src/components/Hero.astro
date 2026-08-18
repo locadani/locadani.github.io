@@ -1,0 +1,53 @@
+---
+import { site } from '../data/site';
+---
+
+<header class="mx-auto max-w-5xl px-6 pt-20 pb-14 sm:pt-28">
+  <p class="font-mono text-xs tracking-[0.18em] text-(--color-ink-faint) uppercase">
+    {site.location}
+  </p>
+
+  <h1
+    class="mt-4 font-serif text-5xl leading-[1.05] font-medium tracking-tight text-balance sm:text-6xl"
+  >
+    {site.name}
+  </h1>
+
+  <p class="mt-5 max-w-2xl text-xl leading-snug text-(--color-ink-soft) text-pretty">
+    {site.tagline}
+  </p>
+
+  <p class="mt-6 max-w-2xl leading-relaxed text-(--color-ink-soft) text-pretty">
+    {site.intro}
+  </p>
+
+  <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+    <a
+      href={site.links.linkedin}
+      class="font-medium text-(--color-accent) underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
+      rel="me noopener"
+    >
+      LinkedIn
+    </a>
+    <a
+      href={site.links.github}
+      class="font-medium text-(--color-accent) underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
+      rel="me noopener"
+    >
+      GitHub
+    </a>
+    <span class="hidden text-(--color-rule) sm:inline" aria-hidden="true">·</span>
+    <p class="text-(--color-ink-faint)">
+      {
+        site.languages.map((lang, i) => (
+          <>
+            {i > 0 && <span class="text-(--color-rule)"> / </span>}
+            <span>
+              {lang.name} <span class="font-mono text-xs">{lang.level}</span>
+            </span>
+          </>
+        ))
+      }
+    </p>
+  </div>
+</header>

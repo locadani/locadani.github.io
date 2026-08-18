@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import { site } from '../data/site';
+
+const title = `${site.name} — ${site.role}`;
+const description = site.tagline;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// Someone will google the name. Give the search result something true and useful.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.role,
+  url: canonical,
+  worksFor: { '@type': 'Organization', name: 'Backwell Tech Corp' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Berlin', addressCountry: 'DE' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Politecnico di Milano' },
+  knowsLanguage: site.languages.map((l) => l.name),
+  sameAs: [site.links.github, site.links.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

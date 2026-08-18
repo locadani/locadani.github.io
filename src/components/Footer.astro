@@ -1,0 +1,32 @@
+---
+import { site } from '../data/site';
+---
+
+<footer class="mx-auto max-w-5xl px-6 pt-6 pb-20">
+  <div
+    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-(--color-rule) pt-7 text-sm text-(--color-ink-faint)"
+  >
+    <a
+      href={site.links.linkedin}
+      class="text-(--color-accent) underline decoration-(--color-rule) decoration-2 underline-offset-4 hover:decoration-(--color-accent)"
+      rel="me noopener">LinkedIn</a
+    >
+    <a
+      href={site.links.github}
+      class="text-(--color-accent) underline decoration-(--color-rule) decoration-2 underline-offset-4 hover:decoration-(--color-accent)"
+      rel="me noopener">GitHub</a
+    >
+    <span class="ml-auto">
+      Built with <a
+        href="https://astro.build"
+        class="underline decoration-(--color-rule) decoration-2 underline-offset-4 hover:decoration-(--color-accent)"
+        rel="noopener">Astro</a
+      >
+      — <a
+        href={site.links.source}
+        class="underline decoration-(--color-rule) decoration-2 underline-offset-4 hover:decoration-(--color-accent)"
+        rel="noopener">source</a
+      >
+    </span>
+  </div>
+</footer>

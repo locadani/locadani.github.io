@@ -1,0 +1,309 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter var', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Light editorial palette: warm paper, near-black ink, one accent. */
+  --color-paper: oklch(99.2% 0.003 85);
+  --color-paper-sunk: oklch(97.4% 0.005 85);
+  --color-ink: oklch(23% 0.012 265);
+  --color-ink-soft: oklch(45% 0.012 265);
+  --color-ink-faint: oklch(63% 0.01 265);
+  --color-rule: oklch(90.5% 0.006 265);
+  --color-rule-soft: oklch(94.5% 0.005 265);
+  --color-accent: oklch(48% 0.15 258);
+  --color-accent-soft: oklch(95.5% 0.028 258);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Visible focus, always. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+}
+
+
+/* Markdown bodies: role entries are bullet lists, project bodies are paragraphs. */
+.prose-tight ul {
+  list-style: disc;
+  padding-left: 1.05rem;
+}
+.prose-tight li {
+  margin-block: 0.3rem;
+}
+.prose-tight strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.prose-tight p + p {
+  margin-top: 0.6rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Two-column timeline.
+
+   Mobile is a plain single column following DOM order, which the component sorts
+   into "job, then what I built during it". At 768px the shared grid switches on:
+   roles occupy column 1 and span every row their dates cover, the year axis is
+   column 2, projects are column 3. Row numbers come from lib/timeline.ts as
+   custom properties, so the placement rules live in one tested place.
+   --------------------------------------------------------------------------- */
+
+.tl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.tl-spine {
+  display: none;
+}
+
+.tl-year {
+  margin-top: 2rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-rule-soft);
+  letter-spacing: 0.12em;
+}
+
+.tl-role {
+  margin-block: 1rem 0.5rem;
+}
+
+.tl-rail {
+  display: none;
+}
+
+.tl-project {
+  position: relative;
+  padding-left: 1.25rem;
+  padding-block: 0.75rem;
+}
+
+.tl-dot {
+  position: absolute;
+  top: 1.05rem;
+  left: 0;
+  display: block;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+@media (min-width: 768px) {
+  .tl {
+    grid-template-columns: minmax(0, 1fr) 3.5rem minmax(0, 1fr);
+    column-gap: 0;
+    align-items: start;
+  }
+
+  /* One element, every row: the continuous axis the two columns hang off. */
+  .tl-spine {
+    display: block;
+    grid-column: 2;
+    grid-row: 1 / -1;
+    justify-self: center;
+    width: 1px;
+    height: 100%;
+    background: var(--color-rule);
+  }
+
+  .tl-year {
+    grid-column: 2;
+    grid-row: var(--row);
+    z-index: 1;
+    margin-top: 0;
+    padding: 0.35rem 0;
+    justify-self: center;
+    border-bottom: 0;
+    background: var(--color-paper);
+    text-align: center;
+  }
+
+  .tl-role {
+    grid-column: 1;
+    /* The bar spans its whole duration — that span is the point of the layout. */
+    grid-row: var(--row-start) / var(--row-end);
+    position: relative;
+    margin: 0;
+    padding: 0.5rem 2rem 1.5rem 0;
+    align-self: stretch;
+    display: flex;
+  }
+
+  /* Vertical rail whose length IS the job's duration, with ticks marking start
+     and end. Without it the role reads as a card that happens to sit near some
+     projects, rather than as a span containing them. */
+  .tl-rail {
+    display: block;
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--color-ink-faint);
+  }
+
+  .tl-rail::before,
+  .tl-rail::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    width: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: inherit;
+  }
+
+  .tl-rail::before {
+    top: 0;
+  }
+
+  .tl-rail::after {
+    bottom: 0;
+  }
+
+  /* Education spans years but is not a job — quieter rail. */
+  .tl-role[data-kind='education'] .tl-rail {
+    background: var(--color-rule);
+    width: 1px;
+  }
+
+  .tl-role-card {
+    /* Sticks while its own span scrolls past, so the job stays visible next to
+       every project that belongs to it. */
+    position: sticky;
+    top: 1.5rem;
+    align-self: flex-start;
+    width: 100%;
+  }
+
+  .tl-project {
+    grid-column: 3;
+    grid-row: var(--row);
+    padding: 0.5rem 0 1.5rem 1.75rem;
+  }
+
+  .tl-dot {
+    top: 0.9rem;
+    left: -0.25rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Timeline filter states.
+
+   The client script only ever sets two attributes: `data-filtering` on the
+   timeline root and `data-match` on each entry. Everything visual happens here,
+   which is why the filter needs no framework.
+   --------------------------------------------------------------------------- */
+
+.entry-body {
+  transition:
+    opacity 220ms ease,
+    max-height 320ms ease,
+    margin 320ms ease;
+}
+
+[data-filtering='true'] [data-match='false'] {
+  opacity: 0.42;
+}
+
+/* Non-matching entries collapse to a thin stub: the spine and the sense of
+   chronology survive filtering, and nothing reflows out from under the reader. */
+[data-filtering='true'] [data-match='false'] .entry-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  pointer-events: none;
+}
+
+[data-filtering='true'] [data-match='false'] .entry-title {
+  color: var(--color-ink-soft);
+  font-weight: 400;
+}
+
+[data-filtering='true'] [data-match='true'] .entry-dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  transform: scale(1.15);
+}
+
+.entry-body {
+  max-height: 60rem;
+}
+
+.entry-dot {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+/* "De-emphasised" must never mean unreadable, and motion is opt-out. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .entry-body,
+  .entry-dot,
+  .chip {
+    transition: none;
+  }
+}
+
+.chip {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+/* The checkbox itself is visually hidden but fully present for keyboard and
+   screen-reader users — the chip label is what is painted. */
+.chip-input:focus-visible + .chip {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.chip-input:checked + .chip {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  [data-filtering='true'] [data-match='false'] {
+    opacity: 1;
+  }
+  [data-filtering='true'] [data-match='false'] .entry-body {
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+  }
+}

@@ -1,71 +1,84 @@
-# Particle Jekyll Theme
+# locadani.github.io
 
-![](./particle.jpg)
+Personal site and portfolio — [locadani.github.io](https://locadani.github.io)
 
-This is a simple and minimalist template for Jekyll designed for developers that want to show of their portfolio.
+Built with [Astro](https://astro.build) and Tailwind CSS. Static output, no
+client-side framework: the only JavaScript on the page is ~3.5 KB driving the
+timeline's technology filter.
 
-The Theme features:
+## Working on it
 
-- Gulp
-- SASS
-- Sweet Scroll
-- Particle.js
-- BrowserSync
-- Font Awesome and Devicon icons
-- Google Analytics
-- Info Customization
-
-## Basic Setup
-
-1. [Install Jekyll](http://jekyllrb.com)
-2. Clone the particle theme: `git clone https://github.com/nrandecker/particle.git`
-3. Edit `_config.yml` to personalize your site.
-
-## Site and User Settings
-
-You have to fill some informations on `_config.yml` to customize your site.
-
-```
-# Site settings
-description: A blog about lorem ipsum dolor sit amet
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://localhost:3000" # the base hostname & protocol for your site
-
-# User settings
-username: Lorem Ipsum
-user_description: Anon Developer at Lorem Ipsum Dolor
-user_title: Anon Developer
-email: anon@anon.com
-twitter_username: lorem_ipsum
-github_username:  lorem_ipsum
-gplus_username:  lorem_ipsum
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # astro check, then a static build into dist/
+npm test         # unit tests
+npx playwright test   # filter interaction tests
 ```
 
-**Don't forget to change your url before you deploy your site!**
+## Adding a project or a job
 
-## Color and Particle Customization
-- Color Customization
-  - Edit the sass variables
-- Particle Customization
-  - Edit the json data in particle function in app.js
-  - Refer to [Particle.js](https://github.com/VincentGarreau/particles.js/) for help
+Add one Markdown file. Nothing else needs touching — the timeline, the ordering
+and the filter chips all follow from the content.
 
-## Running the blog in local
+```
+src/content/projects/my-thing.md
+src/content/experience/my-job.md
+```
 
-In order to compile the assets and run Jekyll on local you need to follow those steps:
+```markdown
+---
+title: My thing
+context: work # work | personal | research | academic
+org: Some Company # optional
+start: 2026-03 # YYYY-MM
+end: 2026-07 # omit while ongoing
+summary: One or two sentences, shown directly under the title.
+tech: [nextjs, typescript, postgresql]
+repo: https://github.com/locadani/my-thing # optional
+---
 
-- Install [NodeJS](https://nodejs.org/)
-- Install [Jekyll](https://jekyllrb.com): `sudo gem install bundler jekyll`
-- Install [Yarn](https://yarnpkg.com/): `npm install -g yarn`
-- Install dependencies: `yarn`
-- Run: `gulp`
+Optional longer body in Markdown, shown under the summary.
+```
 
-## License
+Every `tech` slug must exist in [`src/data/tech.ts`](src/data/tech.ts). Adding a
+technology means adding it there first — an unknown slug fails the build on
+purpose, so a typo can never produce an entry the filter silently ignores.
+Filter chips are derived from the slugs actually in use, so a new technology's
+chip appears by itself.
 
-This theme is free and open source software, distributed under the The MIT License. So feel free to use this Jekyll theme anyway you want.
+Each technology also carries a `category` (language, framework, data, infra, ai,
+tooling). Nothing renders it yet; it exists so the chips can be grouped by kind
+if the flat list gets too long.
 
-## Credits
+## Deploying
 
-This theme was partially designed with the inspiration from these fine folks
-- [Willian Justen](https://github.com/willianjusten/will-jekyll-template)
-- [Vincent Garreau](https://github.com/VincentGarreau/particles.js/)
+Pushing to `main` builds and publishes via
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). The repository's
+Pages source must be set to **GitHub Actions** (Settings → Pages), not "Deploy
+from a branch".
+
+`astro.config.mjs` deliberately sets no `base`: this is a *user* site served from
+the domain root, and setting `base` is the usual cause of broken asset paths here.
+
+## Layout
+
+```
+src/
+  content/
+    experience/    one Markdown file per role or degree
+    projects/      one Markdown file per project
+  content.config.ts  Zod schemas — the build fails on bad content
+  data/
+    tech.ts        canonical technology registry
+    site.ts        name, tagline, links, languages
+  lib/
+    filter.ts      filter logic: pure, DOM-free, unit-tested
+    format.ts      date formatting
+  components/      Hero, Experience, Timeline, FilterScript, Footer
+  pages/index.astro
+docs/superpowers/specs/   design documents
+```
+
+The design and the reasoning behind it are in
+[`docs/superpowers/specs/2026-08-18-portfolio-design.md`](docs/superpowers/specs/2026-08-18-portfolio-design.md).

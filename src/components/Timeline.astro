@@ -1,0 +1,285 @@
+---
+import { getCollection, render } from 'astro:content';
+import { chipsFor, groupChips } from '../lib/filter';
+import { layoutTimeline } from '../lib/timeline';
+import { formatRange, formatMonth } from '../lib/format';
+import { techName } from '../data/tech';
+
+const roleEntries = await getCollection('experience');
+const projectEntries = await getCollection('projects');
+
+// One shared set of grid rows for both columns — this is what makes "that
+// project happened inside that job" true geometrically. See lib/timeline.ts.
+const layout = layoutTimeline(
+  roleEntries.map((r) => ({ id: r.id, start: r.data.start, end: r.data.end })),
+  projectEntries.map((p) => ({ id: p.id, start: p.data.start })),
+);
+
+const rowOfProject = new Map(layout.projects.map((p) => [p.id, p.row]));
+const spanOfRole = new Map(layout.roles.map((r) => [r.id, r]));
+
+const chipGroups = groupChips(
+  chipsFor(projectEntries.map((p) => ({ id: p.id, tech: p.data.tech }))),
+);
+const projectCount = projectEntries.length;
+
+/** Work and personal lead; research and university fill out the early years. */
+const LEADING = new Set(['work', 'personal']);
+const CONTEXT_LABEL = {
+  work: 'Work',
+  personal: 'Personal',
+  research: 'Research',
+  academic: 'University',
+} as const;
+
+const roles = await Promise.all(
+  roleEntries.map(async (entry) => ({
+    kind: 'role' as const,
+    entry,
+    span: spanOfRole.get(entry.id)!,
+    Content: (await render(entry)).Content,
+  })),
+);
+
+const projects = await Promise.all(
+  projectEntries.map(async (entry) => ({
+    kind: 'project' as const,
+    entry,
+    row: rowOfProject.get(entry.id)!,
+    Content: (await render(entry)).Content,
+  })),
+);
+
+/**
+ * DOM order drives the single-column mobile layout, where the CSS grid placement
+ * is switched off. Sorting by row — roles first at a tie — makes a phone read as
+ * "here is the job, and here is what I built during it", which is the same story
+ * the two columns tell on a wide screen.
+ */
+const items = [
+  ...layout.yearMarkers.map((marker) => ({ kind: 'year' as const, ...marker })),
+  ...roles.map((role) => ({ ...role, row: role.span.rowStart })),
+  ...projects,
+].sort((a, b) => {
+  const priority = { year: 0, role: 1, project: 2 } as const;
+  return a.row - b.row || priority[a.kind] - priority[b.kind];
+});
+---
+
+<section class="mx-auto max-w-5xl px-6 py-14" aria-labelledby="timeline-heading">
+  <h2
+    id="timeline-heading"
+    class="font-mono text-xs tracking-[0.18em] text-(--color-ink-faint) uppercase"
+  >
+    Career &amp; projects
+  </h2>
+  {/* The caption has to be true in both layouts: there are no columns on a phone. */}
+  <p class="mt-2 max-w-2xl text-sm text-(--color-ink-faint)">
+    <span class="md:hidden">Each role, followed by what I built during it.</span>
+    <span class="hidden md:inline"
+      >Roles on the left, what I built on the right — aligned, so you can see what
+      I did when.</span
+    >
+  </p>
+
+  <!-- Real checkboxes in a real fieldset: keyboard and screen-reader support
+       without ARIA gymnastics. Ships hidden, because with no JS it would do
+       nothing; the script reveals it. -->
+  <form id="tech-filter" class="no-print mt-8 hidden" data-filter-form>
+    <fieldset>
+      <legend class="text-sm text-(--color-ink-soft)">
+        Filter by technology <span class="text-(--color-ink-faint)"
+          >— select any that apply</span
+        >
+      </legend>
+
+      <div class="mt-4 space-y-2.5">
+        {
+          chipGroups.map((group) => (
+            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1.5">
+              <p class="w-24 shrink-0 font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
+                {group.label}
+              </p>
+              {group.chips.map((chip) => (
+                <div>
+                  <input
+                    type="checkbox"
+                    id={`tech-${chip.slug}`}
+                    name="tech"
+                    value={chip.slug}
+                    class="chip-input sr-only"
+                  />
+                  <label
+                    for={`tech-${chip.slug}`}
+                    class="chip block cursor-pointer rounded-full border border-(--color-rule) bg-(--color-paper) px-2.5 py-0.5 text-[0.8125rem] select-none hover:border-(--color-ink-faint)"
+                  >
+                    {chip.name}
+                    {/* Decorative: without aria-hidden the accessible name
+                        becomes "React3", read aloud as "React three". */}
+                    <span
+                      class="ml-1 font-mono text-[0.6875rem] opacity-55"
+                      aria-hidden="true"
+                    >
+                      {chip.count}
+                    </span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-4 flex h-6 items-center gap-3 text-sm">
+        <p aria-live="polite" class="text-(--color-ink-faint)" data-filter-count></p>
+        <button
+          type="reset"
+          class="hidden text-(--color-accent) underline decoration-(--color-rule) decoration-2 underline-offset-4 hover:decoration-(--color-accent)"
+          data-filter-reset>Clear</button
+        >
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="tl mt-10" data-timeline data-filtering="false">
+    <!-- The axis line, one element spanning every row. -->
+    <span class="tl-spine" aria-hidden="true"></span>
+
+    {
+      items.map((item) => {
+        if (item.kind === 'year') {
+          return (
+            <p
+              class="tl-year font-mono text-[0.6875rem] text-(--color-ink-faint)"
+              style={`--row: ${item.row}`}
+            >
+              {item.year}
+            </p>
+          );
+        }
+
+        if (item.kind === 'role') {
+          const { entry, span, Content } = item;
+          return (
+            <div
+              class="tl-role"
+              style={`--row-start: ${span.rowStart}; --row-end: ${span.rowEnd}`}
+              data-kind={entry.data.kind}
+            >
+              {/* The rail is the whole point of the layout: its length is the
+                  job's real duration, so every project beside it visibly
+                  happened during that job. */}
+              <span class="tl-rail" aria-hidden="true"></span>
+              <div
+                class:list={[
+                  'tl-role-card rounded-md border px-4 py-3',
+                  entry.data.kind === 'education'
+                    ? 'border-(--color-rule-soft) bg-transparent'
+                    : 'border-(--color-rule) bg-(--color-paper-sunk)',
+                ]}
+              >
+                <h3
+                  class:list={[
+                    'leading-snug',
+                    entry.data.kind === 'education' ? 'font-normal' : 'font-semibold',
+                  ]}
+                >
+                  {entry.data.role}
+                </h3>
+                <p class="text-sm text-(--color-ink-soft)">{entry.data.org}</p>
+                <p class="mt-0.5 font-mono text-[0.6875rem] text-(--color-ink-faint)">
+                  {formatRange(entry.data.start, entry.data.end)}
+                  <span class="mx-1 opacity-50">·</span>
+                  {entry.data.location}
+                </p>
+
+                <div class="prose-tight mt-2.5 text-[0.875rem] leading-relaxed text-(--color-ink-soft)">
+                  <Content />
+                </div>
+
+                <ul class="mt-2.5 flex flex-wrap gap-x-2 gap-y-1" aria-label="Technologies">
+                  {entry.data.tech.map((slug, i) => (
+                    <li class="font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
+                      {i > 0 && (
+                        <span class="mr-2 text-(--color-rule)" aria-hidden="true">
+                          ·
+                        </span>
+                      )}
+                      {techName(slug)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          );
+        }
+
+        const { entry, row, Content } = item;
+        const leading = LEADING.has(entry.data.context);
+        return (
+          <div
+            class="tl-project"
+            style={`--row: ${row}`}
+            data-entry
+            data-match="true"
+            data-tech={entry.data.tech.join(' ')}
+          >
+            <span
+              class:list={[
+                'entry-dot tl-dot',
+                leading
+                  ? 'border-(--color-ink-soft) bg-(--color-ink-soft)'
+                  : 'border-(--color-rule) bg-(--color-paper)',
+              ]}
+              aria-hidden="true"
+            />
+
+            <h3 class="entry-title leading-snug font-semibold">
+              {entry.data.repo ? (
+                <a
+                  href={entry.data.repo}
+                  class="underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
+                  rel="noopener"
+                >
+                  {entry.data.title}
+                </a>
+              ) : (
+                entry.data.title
+              )}
+            </h3>
+
+            <p class="mt-0.5 font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
+              {entry.data.end
+                ? formatRange(entry.data.start, entry.data.end)
+                : formatMonth(entry.data.start)}
+              <span class="mx-1.5 opacity-50">·</span>
+              {CONTEXT_LABEL[entry.data.context]}
+            </p>
+
+            <div class="entry-body mt-2">
+              <p class="text-[0.9375rem] leading-relaxed text-(--color-ink-soft) text-pretty">
+                {entry.data.summary}
+              </p>
+
+              <div class="prose-tight mt-2 space-y-2 text-[0.875rem] leading-relaxed text-(--color-ink-faint) text-pretty">
+                <Content />
+              </div>
+
+              <ul class="mt-2.5 flex flex-wrap gap-1" aria-label="Technologies used">
+                {entry.data.tech.map((slug) => (
+                  <li class="rounded border border-(--color-rule-soft) bg-(--color-paper-sunk) px-1.5 py-0.5 font-mono text-[0.6875rem] text-(--color-ink-faint)">
+                    {techName(slug)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+
+  <p class="mt-4 text-xs text-(--color-ink-faint)">
+    {projectCount} projects · roles shown as bars spanning their dates
+  </p>
+</section>
