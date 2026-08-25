@@ -55,8 +55,8 @@ const projects = defineCollection({
         end: month.optional(),
         tech,
         repo: z.url().optional(),
-        /** A screenshot or diagram, colocated with the entry (e.g. `./foo.svg`). */
-        image: z.object({ src: image(), alt: z.string() }).optional(),
+        /** Screenshots or diagrams, colocated with the entry (e.g. `./foo.svg`). */
+        images: z.array(z.object({ src: image(), alt: z.string() })).optional(),
       })
       .refine(endNotBeforeStart, endNotBeforeStartError),
 });

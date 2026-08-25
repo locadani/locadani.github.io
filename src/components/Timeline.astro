@@ -290,22 +290,28 @@ const items = [
                 </p>
               </div>
 
-              {entry.data.image && (
-                <a
-                  href={entry.data.image.src.src}
-                  target="_blank"
-                  rel="noopener"
-                  class="block shrink-0"
-                  aria-label={`Open full-size image: ${entry.data.image.alt}`}
-                >
-                  <Image
-                    src={entry.data.image.src}
-                    alt={entry.data.image.alt}
-                    width={160}
-                    height={112}
-                    class="h-14 w-20 rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
-                  />
-                </a>
+              {entry.data.images && entry.data.images.length > 0 && (
+                <div class="flex shrink-0 flex-row gap-1.5" data-lightbox-group={entry.id}>
+                  {entry.data.images.map((img) => (
+                    <a
+                      href={img.src.src}
+                      target="_blank"
+                      rel="noopener"
+                      class="block"
+                      aria-label={`Open full-size image: ${img.alt}`}
+                      data-lightbox-trigger
+                      data-lightbox-alt={img.alt}
+                    >
+                      <Image
+                        src={img.src}
+                        alt={img.alt}
+                        width={160}
+                        height={112}
+                        class="h-14 w-20 rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
+                      />
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
 

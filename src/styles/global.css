@@ -331,6 +331,93 @@ body {
   color: var(--color-paper);
 }
 
+.lightbox {
+  /* Tailwind's preflight zeroes every element's margin, which is what the
+     native dialog:modal UA stylesheet relies on to center via `margin:
+     auto` — so centering is pinned explicitly here instead. */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  margin: 0;
+  max-width: min(90vw, 60rem);
+  max-height: 85vh;
+  padding: 0;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--color-paper);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+}
+
+.lightbox::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+.lightbox img {
+  display: block;
+  max-width: min(90vw, 60rem);
+  max-height: calc(85vh - 2rem);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+  line-height: 1;
+}
+
+.lightbox-close:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink-faint);
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: calc(50% - 1rem);
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.lightbox-nav:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink-faint);
+}
+
+.lightbox-prev {
+  left: 0.5rem;
+}
+
+.lightbox-next {
+  right: 0.5rem;
+}
+
+.lightbox-index {
+  margin: 0;
+  padding-block: 0.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-ink-faint);
+}
+
 @media print {
   .no-print {
     display: none !important;

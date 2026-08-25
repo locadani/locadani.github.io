@@ -1,0 +1,88 @@
+---
+/**
+ * One shared <dialog> for every project's thumbnails. Triggers keep their
+ * real `href` to the full image, so without JS a click still opens it —
+ * this script only intercepts the click to show it in place instead.
+ *
+ * Prev/next paging is scoped to the clicked trigger's `[data-lightbox-group]`
+ * ancestor (one per project — see Timeline.astro), so paging never crosses
+ * from one project's images into another's.
+ */
+---
+
+<dialog id="lightbox" class="lightbox" aria-label="Full-size image">
+  <button type="button" class="lightbox-close" data-lightbox-close aria-label="Close">✕</button>
+  <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Previous image">
+    ‹
+  </button>
+  <img data-lightbox-img alt="" />
+  <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Next image">
+    ›
+  </button>
+  <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
+  const img = dialog?.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  const closeBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+  const prevBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
+  const nextBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+  const indexEl = dialog?.querySelector<HTMLElement>('[data-lightbox-index]');
+
+  if (dialog && img && closeBtn && prevBtn && nextBtn && indexEl) {
+    // The full set of images in the currently-open group, and where we are
+    // within it — both re-derived from the DOM each time a trigger opens
+    // the dialog, so they always match what's actually on the page.
+    let items: HTMLAnchorElement[] = [];
+    let current = 0;
+
+    const show = (index: number) => {
+      current = index;
+      const item = items[current];
+      img.src = item.href;
+      img.alt = item.dataset.lightboxAlt ?? '';
+
+      const hasMultiple = items.length > 1;
+      prevBtn.hidden = !hasMultiple;
+      nextBtn.hidden = !hasMultiple;
+      indexEl.hidden = !hasMultiple;
+      indexEl.textContent = `${current + 1} / ${items.length}`;
+    };
+
+    const step = (delta: number) => show((current + delta + items.length) % items.length);
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-lightbox-trigger]').forEach((trigger) => {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const group = trigger.closest<HTMLElement>('[data-lightbox-group]');
+        items = group
+          ? [...group.querySelectorAll<HTMLAnchorElement>('[data-lightbox-trigger]')]
+          : [trigger];
+        show(items.indexOf(trigger));
+        dialog.showModal();
+      });
+    });
+
+    prevBtn.addEventListener('click', () => step(-1));
+    nextBtn.addEventListener('click', () => step(1));
+    closeBtn.addEventListener('click', () => dialog.close());
+
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && !prevBtn.hidden) step(-1);
+      else if (e.key === 'ArrowRight' && !nextBtn.hidden) step(1);
+    });
+
+    // The backdrop has no element of its own to listen on, so a click
+    // outside the dialog's own box (rather than its content) closes it.
+    dialog.addEventListener('click', (e) => {
+      const rect = dialog.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      if (!inside) dialog.close();
+    });
+  }
+</script>
