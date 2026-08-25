@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
 import { chipsFor, groupChips } from '../lib/filter';
 import { layoutTimeline, roleCovers } from '../lib/timeline';
 import { formatRange, formatMonth } from '../lib/format';
@@ -258,33 +259,55 @@ const items = [
               aria-hidden="true"
             />
 
-            <h3 class="entry-title leading-snug font-semibold">
-              {entry.data.repo ? (
-                <a
-                  href={entry.data.repo}
-                  class="underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
-                  rel="noopener"
-                >
-                  {entry.data.title}
-                </a>
-              ) : (
-                entry.data.title
-              )}
-            </h3>
+            <div class="flex items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <h3 class="entry-title leading-snug font-semibold">
+                  {entry.data.repo ? (
+                    <a
+                      href={entry.data.repo}
+                      class="underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
+                      rel="noopener"
+                    >
+                      {entry.data.title}
+                    </a>
+                  ) : (
+                    entry.data.title
+                  )}
+                </h3>
 
-            <p class="mt-0.5 font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
-              {entry.data.end
-                ? formatRange(entry.data.start, entry.data.end)
-                : formatMonth(entry.data.start)}
-              <span class="mx-1.5 opacity-50">·</span>
-              {CONTEXT_LABEL[entry.data.context]}
-              {contextFor(entry) && (
-                <>
+                <p class="mt-0.5 font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
+                  {entry.data.end
+                    ? formatRange(entry.data.start, entry.data.end)
+                    : formatMonth(entry.data.start)}
                   <span class="mx-1.5 opacity-50">·</span>
-                  {contextFor(entry)}
-                </>
+                  {CONTEXT_LABEL[entry.data.context]}
+                  {contextFor(entry) && (
+                    <>
+                      <span class="mx-1.5 opacity-50">·</span>
+                      {contextFor(entry)}
+                    </>
+                  )}
+                </p>
+              </div>
+
+              {entry.data.image && (
+                <a
+                  href={entry.data.image.src.src}
+                  target="_blank"
+                  rel="noopener"
+                  class="block shrink-0"
+                  aria-label={`Open full-size image: ${entry.data.image.alt}`}
+                >
+                  <Image
+                    src={entry.data.image.src}
+                    alt={entry.data.image.alt}
+                    width={160}
+                    height={112}
+                    class="h-14 w-20 rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
+                  />
+                </a>
               )}
-            </p>
+            </div>
 
             <div class="entry-body mt-2">
               <p class="text-[0.9375rem] leading-relaxed text-(--color-ink-soft) text-pretty">

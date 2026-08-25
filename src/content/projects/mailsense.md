@@ -5,6 +5,9 @@ org: Backwell Tech Corp
 start: 2025-12
 summary: An email automation platform that I migrated from single-tenant to multi-tenant, so one deployment can serve many customers in isolation.
 tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, python]
+image:
+  src: ./mailsense-architecture.svg
+  alt: Diagram of the MailSense email pipeline, showing the email processor reading and sending mail via Outlook, Gmail, or generic IMAP/SMTP, storing data in per-tenant storage, and pushing each tenant's context to a single shared AI agent that classifies email and drafts replies using that pushed context instead of its own database.
 ---
 
 A master database routes each request to the correct tenant database, with per-tenant mail

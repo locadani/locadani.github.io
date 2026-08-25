@@ -43,19 +43,22 @@ const experience = defineCollection({
 
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
-  schema: z
-    .object({
-      title: z.string(),
-      /** Drives prominence: work and personal lead, the rest fill out the years. */
-      context: z.enum(['work', 'personal', 'research', 'academic']),
-      org: z.string().optional(),
-      summary: z.string(),
-      start: month,
-      end: month.optional(),
-      tech,
-      repo: z.url().optional(),
-    })
-    .refine(endNotBeforeStart, endNotBeforeStartError),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string(),
+        /** Drives prominence: work and personal lead, the rest fill out the years. */
+        context: z.enum(['work', 'personal', 'research', 'academic']),
+        org: z.string().optional(),
+        summary: z.string(),
+        start: month,
+        end: month.optional(),
+        tech,
+        repo: z.url().optional(),
+        /** A screenshot or diagram, colocated with the entry (e.g. `./foo.svg`). */
+        image: z.object({ src: image(), alt: z.string() }).optional(),
+      })
+      .refine(endNotBeforeStart, endNotBeforeStartError),
 });
 
 export const collections = { experience, projects };

@@ -5,6 +5,9 @@ org: Backwell Tech Corp
 start: 2026-05
 summary: A multi-tenant SaaS platform for businesses running printed-letter campaigns to existing customers and new prospects, with churn and lifetime-value predictions to prioritise who to contact.
 tech: [nextjs, react, typescript, supabase, postgresql, tailwind, stripe, openai, leaflet, tanstack-query, vitest]
+image:
+  src: ./customer-intelligence-architecture.svg
+  alt: Diagram of Customer Intelligence's per-tenant pipeline, from CSV import through geocoding, churn/LTV scoring, and personalization, handing off to a separate, standalone letter service that submits PDFs to Pingen and reports delivery status back over a webhook.
 ---
 
 Customers are imported from CSV, geocoded, and segmented on a map. Each recipient gets a

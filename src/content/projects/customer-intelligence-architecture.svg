@@ -1,0 +1,76 @@
+<svg width="1320" height="330" viewBox="0 0 1320 330" xmlns="http://www.w3.org/2000/svg" role="img"
+  aria-label="Diagram of Customer Intelligence's per-tenant pipeline, from CSV import through geocoding, churn/LTV scoring, and personalization, handing off to a separate, standalone letter service that submits PDFs to Pingen and reports delivery status back over a webhook.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52555c" />
+    </marker>
+  </defs>
+
+  <g font-family="ui-sans-serif, system-ui, sans-serif">
+
+    <!-- ===================== Customer Intelligence: per-tenant boundary ===================== -->
+    <rect x="24" y="36" width="584" height="240" rx="10" fill="none" stroke="#dee0e4" stroke-width="1.5" stroke-dasharray="5 4" />
+    <text x="316" y="54" text-anchor="middle" font-size="10" letter-spacing="0.05em" fill="#86898f">CUSTOMER INTELLIGENCE — PER-TENANT · ROW-LEVEL SECURITY</text>
+
+    <!-- pipeline row -->
+    <rect x="44" y="90" width="104" height="70" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="96" y="129" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">CSV import</text>
+
+    <rect x="190" y="90" width="104" height="70" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="242" y="121" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">Geocode &amp;</text>
+    <text x="242" y="137" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">segment</text>
+
+    <rect x="336" y="90" width="104" height="70" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="388" y="121" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">Score</text>
+    <text x="388" y="137" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">churn / LTV</text>
+
+    <rect x="482" y="90" width="104" height="70" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="534" y="121" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">Personalize</text>
+    <text x="534" y="137" text-anchor="middle" font-size="10.5" fill="#52555c">letter content</text>
+
+    <line x1="150" y1="125" x2="188" y2="125" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="169" y="112" text-anchor="middle" font-size="9.5" fill="#52555c">geocodes</text>
+
+    <line x1="296" y1="125" x2="334" y2="125" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="315" y="112" text-anchor="middle" font-size="9.5" fill="#52555c">scores</text>
+
+    <line x1="442" y1="125" x2="480" y2="125" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="461" y="112" text-anchor="middle" font-size="9.5" fill="#52555c">drafts</text>
+
+    <!-- personalize debits the per-tenant credit ledger -->
+    <line x1="534" y1="160" x2="534" y2="198" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="544" y="183" font-size="10" fill="#52555c">debits</text>
+
+    <rect x="482" y="200" width="104" height="60" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="534" y="224" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1d23">Credit ledger</text>
+    <text x="534" y="240" text-anchor="middle" font-size="10.5" fill="#52555c">Stripe · per tenant</text>
+
+    <!-- ===================== Letter Service: separate, standalone ===================== -->
+    <rect x="754" y="50" width="240" height="150" rx="10" fill="#e5f1ff" stroke="#1d5ab0" stroke-width="2" />
+    <text x="874" y="70" text-anchor="middle" font-size="10" letter-spacing="0.05em" fill="#1d5ab0">SEPARATE SERVICE</text>
+    <text x="874" y="97" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1d23">Letter Service</text>
+    <text x="874" y="117" text-anchor="middle" font-size="11" fill="#52555c">Generates &amp; sends postal PDFs</text>
+    <text x="874" y="135" text-anchor="middle" font-size="10" fill="#86898f">own tenancy: per-app API keys</text>
+
+    <!-- ===================== Pingen: third-party postal API ===================== -->
+    <rect x="1124" y="85" width="170" height="80" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
+    <text x="1209" y="118" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1d23">Pingen</text>
+    <text x="1209" y="136" text-anchor="middle" font-size="10.5" fill="#52555c">postal API · print &amp; post</text>
+
+    <!-- Customer Intelligence <-> Letter Service -->
+    <line x1="608" y1="105" x2="752" y2="105" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="680" y="95" text-anchor="middle" font-size="10.5" fill="#52555c">sends letter batch</text>
+
+    <line x1="752" y1="145" x2="608" y2="145" stroke="#52555c" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+    <text x="680" y="160" text-anchor="middle" font-size="10.5" fill="#52555c">delivery status</text>
+
+    <!-- Letter Service <-> Pingen -->
+    <line x1="996" y1="105" x2="1122" y2="105" stroke="#52555c" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="1059" y="95" text-anchor="middle" font-size="10.5" fill="#52555c">submits PDF</text>
+
+    <line x1="1122" y1="145" x2="996" y2="145" stroke="#52555c" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+    <text x="1059" y="160" text-anchor="middle" font-size="10.5" fill="#52555c">delivery webhook</text>
+
+    <text x="660" y="306" text-anchor="middle" font-size="11.5" fill="#86898f">Letter dispatch is a separate deployment with its own tenancy — only it talks to Pingen.</text>
+  </g>
+</svg>
