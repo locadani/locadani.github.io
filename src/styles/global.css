@@ -336,6 +336,11 @@ body {
      native dialog:modal UA stylesheet relies on to center via `margin:
      auto` — so centering is pinned explicitly here instead. */
   position: fixed;
+  /* The UA stylesheet sets `right: 0`, which — combined with the `left: 50%`
+     below — over-widens the box to fill that gap instead of shrinking to
+     the image, leaving a portrait image stranded on the left. Clearing
+     every inset first stops that. */
+  inset: auto;
   top: 50%;
   left: 50%;
   translate: -50% -50%;
@@ -349,20 +354,58 @@ body {
   box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
 }
 
+/* Scoped to [open] rather than plain `.lightbox`: an author `display`
+   declaration applies regardless of specificity, so an unscoped `flex`
+   here would beat the UA stylesheet's `dialog:not([open]) { display:
+   none }` and leave the dialog (and its buttons) visible after close. */
+.lightbox[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .lightbox::backdrop {
   background: rgb(0 0 0 / 0.6);
+}
+
+/* The dialog itself is focused on open (see Lightbox.astro) purely to keep
+   the close button from lighting up unprompted — it isn't a control, so it
+   gets no visible ring of its own. */
+.lightbox:focus-visible {
+  outline: none;
+}
+
+/* Positioning context for the prev/next buttons, so they stay centered on
+   the image itself instead of the taller box once the caption is added
+   below. */
+.lightbox-stage {
+  position: relative;
+  display: flex;
 }
 
 .lightbox img {
   display: block;
   max-width: min(90vw, 60rem);
-  max-height: calc(85vh - 2rem);
+  max-height: calc(85vh - 4.5rem);
+}
+
+.lightbox-caption {
+  margin: 0;
+  padding: 0.5rem 1rem 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
 }
 
 .lightbox-close {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  /* .lightbox-stage is also a positioned box and comes after this button in
+     the DOM, so at the shared z-index:auto layer it would otherwise paint
+     on top and swallow clicks on the corner where they overlap. */
+  z-index: 1;
   display: flex;
   height: 2rem;
   width: 2rem;
@@ -382,7 +425,8 @@ body {
 
 .lightbox-nav {
   position: absolute;
-  top: calc(50% - 1rem);
+  top: 50%;
+  translate: 0 -50%;
   display: flex;
   height: 2.5rem;
   width: 2.5rem;

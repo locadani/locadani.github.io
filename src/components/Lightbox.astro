@@ -10,15 +10,18 @@
  */
 ---
 
-<dialog id="lightbox" class="lightbox" aria-label="Full-size image">
+<dialog id="lightbox" class="lightbox" aria-label="Full-size image" tabindex="-1">
   <button type="button" class="lightbox-close" data-lightbox-close aria-label="Close">✕</button>
-  <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Previous image">
-    ‹
-  </button>
-  <img data-lightbox-img alt="" />
-  <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Next image">
-    ›
-  </button>
+  <div class="lightbox-stage">
+    <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Previous image">
+      ‹
+    </button>
+    <img data-lightbox-img alt="" />
+    <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Next image">
+      ›
+    </button>
+  </div>
+  <p class="lightbox-caption" data-lightbox-caption></p>
   <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
 </dialog>
 
@@ -28,9 +31,10 @@
   const closeBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-close]');
   const prevBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-prev]');
   const nextBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-next]');
+  const captionEl = dialog?.querySelector<HTMLElement>('[data-lightbox-caption]');
   const indexEl = dialog?.querySelector<HTMLElement>('[data-lightbox-index]');
 
-  if (dialog && img && closeBtn && prevBtn && nextBtn && indexEl) {
+  if (dialog && img && closeBtn && prevBtn && nextBtn && captionEl && indexEl) {
     // The full set of images in the currently-open group, and where we are
     // within it — both re-derived from the DOM each time a trigger opens
     // the dialog, so they always match what's actually on the page.
@@ -42,6 +46,8 @@
       const item = items[current];
       img.src = item.href;
       img.alt = item.dataset.lightboxAlt ?? '';
+      captionEl.textContent = item.dataset.lightboxAlt ?? '';
+      captionEl.hidden = !item.dataset.lightboxAlt;
 
       const hasMultiple = items.length > 1;
       prevBtn.hidden = !hasMultiple;
@@ -61,6 +67,10 @@
           : [trigger];
         show(items.indexOf(trigger));
         dialog.showModal();
+        // showModal() auto-focuses the first focusable descendant (the close
+        // button), which lights up its focus ring on every open even though
+        // the user didn't tab to it. Focus the dialog itself instead.
+        dialog.focus({ preventScroll: true });
       });
     });
 
