@@ -52,7 +52,6 @@ export const TECH = {
   'java-ee': { name: 'Java EE', category: 'framework' },
   tailwind: { name: 'Tailwind CSS', category: 'framework' },
   threejs: { name: 'three.js', category: 'framework' },
-  leaflet: { name: 'Leaflet', category: 'framework' },
   'tanstack-query': { name: 'TanStack Query', category: 'framework' },
 
   // Data stores
@@ -74,6 +73,7 @@ export const TECH = {
   stripe: { name: 'Stripe', category: 'infra' },
   'microsoft-graph': { name: 'Microsoft Graph', category: 'infra' },
   'entra-id': { name: 'Microsoft Entra ID', category: 'infra' },
+  'gmail-api': { name: 'Gmail API', category: 'infra' },
 
   // AI and ML
   openai: { name: 'OpenAI', category: 'ai' },
@@ -88,6 +88,7 @@ export const TECH = {
   playwright: { name: 'Playwright', category: 'tooling' },
   k6: { name: 'k6', category: 'tooling' },
   gradle: { name: 'Gradle', category: 'tooling' },
+  figma: { name: 'Figma', category: 'tooling' },
 } as const satisfies Record<string, TechMeta>;
 
 export type TechSlug = keyof typeof TECH;

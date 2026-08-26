@@ -3,8 +3,8 @@ title: MailSense
 context: work
 org: Backwell Tech Corp
 start: 2025-12
-summary: An email automation platform that I migrated from single-tenant to multi-tenant, so one deployment can serve many customers in isolation.
-tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, python]
+summary: An email automation platform where an AI agent reads incoming mail and drafts replies, with per-tenant feature flags controlling which capabilities each customer has.
+tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, gmail-api, python]
 images:
   - src: ./mailsense-architecture.svg
     alt: Diagram of the MailSense email pipeline, showing the email processor reading and sending mail via Outlook, Gmail, or generic IMAP/SMTP, storing data in per-tenant storage, and pushing each tenant's context to a single shared AI agent that classifies email and drafts replies using that pushed context instead of its own database.
@@ -15,10 +15,7 @@ images:
 ---
 
 A master database routes each request to the correct tenant database, with per-tenant mail
-connections and object storage buckets. Mail is ingested by a dedicated processor over
-IMAP and SMTP, or through the Microsoft Graph API where a tenant uses Outlook; stored
-credentials are encrypted.
+connections and object storage buckets. Mail is ingested by a dedicated processor over different sources (IMAP/SMTP, Microsoft Graph API or Gmail API).
 
-The platform runs as several services — an API, an email processor, a sense processor and
-shared libraries — with a legacy MVC dashboard being progressively retired. Local
-development runs the whole stack, mail server included, in Docker.
+The platform runs as several services — an API, an email processor, the Python AI agent,
+and shared libraries. Local development runs the whole stack, mail server included, in Docker.
