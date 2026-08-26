@@ -10,6 +10,8 @@ images:
     alt: Diagram of Customer Intelligence's per-tenant pipeline, from CSV import through geocoding, churn/LTV scoring, and personalization, handing off to a separate, standalone letter service that submits PDFs to Pingen and reports delivery status back over a webhook.
   - src: ./customer-intelligence-map.png
     alt: The customer map, showing prospects and customers across Italy and Europe clustered geographically and colored by predicted lifetime value.
+  - src: ./customer-intelligence-dashboard.png
+    alt: A campaign dashboard showing total sales, conversion rate, views, a contacted-shops list, top products, and top buyers.
 ---
 
 Customers are imported from CSV, geocoded, and segmented on a map. Each recipient gets a
