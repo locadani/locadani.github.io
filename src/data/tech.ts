@@ -52,6 +52,7 @@ export const TECH = {
   'java-ee': { name: 'Java EE', category: 'framework' },
   tailwind: { name: 'Tailwind CSS', category: 'framework' },
   threejs: { name: 'three.js', category: 'framework' },
+  motion: { name: 'Motion', category: 'framework' },
   'tanstack-query': { name: 'TanStack Query', category: 'framework' },
 
   // Data stores
