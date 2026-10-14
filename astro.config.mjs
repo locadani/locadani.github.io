@@ -9,5 +9,9 @@ export default defineConfig({
   // is the usual cause of broken asset paths on a user site.
   site: 'https://locadani.github.io',
   integrations: [sitemap()],
+  // Short, shareable link to the live app; built as a static meta-refresh page.
+  redirects: {
+    '/smoke-tracker': 'https://smoke-tracker-652140494466.europe-west3.run.app/',
+  },
   vite: { plugins: [tailwindcss()] },
 });

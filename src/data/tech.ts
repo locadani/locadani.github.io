@@ -54,6 +54,8 @@ export const TECH = {
   threejs: { name: 'three.js', category: 'framework' },
   motion: { name: 'Motion', category: 'framework' },
   'tanstack-query': { name: 'TanStack Query', category: 'framework' },
+  axum: { name: 'Axum', category: 'framework' },
+  htmx: { name: 'htmx', category: 'framework' },
 
   // Data stores
   postgresql: { name: 'PostgreSQL', category: 'data' },
@@ -70,6 +72,8 @@ export const TECH = {
   'github-actions': { name: 'GitHub Actions', category: 'infra' },
   railway: { name: 'Railway', category: 'infra' },
   azure: { name: 'Azure', category: 'infra' },
+  'google-cloud': { name: 'Google Cloud', category: 'infra' },
+  terraform: { name: 'Terraform', category: 'infra' },
   bicep: { name: 'Bicep', category: 'infra' },
   stripe: { name: 'Stripe', category: 'infra' },
   'microsoft-graph': { name: 'Microsoft Graph', category: 'infra' },
