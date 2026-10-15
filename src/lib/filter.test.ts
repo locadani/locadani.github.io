@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   chipsFor,
+  describeMatch,
   groupChips,
   matches,
   parseTechParam,
@@ -166,5 +167,25 @@ describe('groupChips', () => {
 
   it('returns nothing for no chips', () => {
     expect(groupChips([])).toEqual([]);
+  });
+});
+
+describe('describeMatch', () => {
+  it('invites a selection when nothing is filtered', () => {
+    expect(describeMatch(17, 17, [])).toBe('17 projects · pick a technology to filter');
+  });
+
+  it('names a single technology', () => {
+    expect(describeMatch(4, 17, ['React'])).toBe('4 of 17 projects use React');
+  });
+
+  it('spells out OR for two technologies', () => {
+    expect(describeMatch(6, 17, ['React', 'Kotlin'])).toBe('6 of 17 projects use React or Kotlin');
+  });
+
+  it('stops listing names past two', () => {
+    expect(describeMatch(9, 17, ['React', 'Kotlin', 'Rust'])).toBe(
+      '9 of 17 projects use any of 3 technologies',
+    );
   });
 });

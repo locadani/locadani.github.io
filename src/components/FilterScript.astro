@@ -6,16 +6,23 @@
  * lib/filter.ts, and writes two attributes — `data-filtering` on the root and
  * `data-match` on each entry. All dimming and collapsing is CSS. That is why
  * there is no framework here: the DOM work is genuinely this small.
+ *
+ * The one piece of extra feedback is the results bar: a click on a chip changes
+ * a timeline that may be off-screen, so the bar says in words what happened
+ * ("4 of 17 projects use React") and offers a way back out.
  */
 ---
 
 <script>
-  import { matches, parseTechParam, serializeTechParam } from '../lib/filter';
+  import { describeMatch, matches, parseTechParam, serializeTechParam } from '../lib/filter';
 
   const form = document.querySelector<HTMLFormElement>('[data-filter-form]');
   const timeline = document.querySelector<HTMLElement>('[data-timeline]');
+  const bar = document.querySelector<HTMLElement>('[data-filter-bar]');
   const countEl = document.querySelector<HTMLElement>('[data-filter-count]');
+  const pillsEl = document.querySelector<HTMLElement>('[data-filter-pills]');
   const resetEl = document.querySelector<HTMLElement>('[data-filter-reset]');
+  const toggleEl = document.querySelector<HTMLButtonElement>('[data-filter-toggle]');
 
   if (form && timeline) {
     const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="tech"]')];
@@ -24,16 +31,41 @@
       id: el.dataset.tech ?? '',
       tech: (el.dataset.tech ?? '').split(' ').filter(Boolean),
     }));
+    const nameOf = new Map(boxes.map((b) => [b.value, b.dataset.name ?? b.value]));
 
     // The filter does nothing without JS, so it ships hidden and is revealed here.
     form.classList.remove('hidden');
+    bar?.classList.remove('hidden');
 
     // Every tech pill on every card, so a selected technology can be picked out
     // within the cards that survived the filter.
     const tags = [...timeline.querySelectorAll<HTMLElement>('[data-tech-tag]')];
 
+    const renderPills = (selected: Set<string>) => {
+      if (!pillsEl) return;
+      pillsEl.replaceChildren(
+        ...[...selected].map((slug) => {
+          const li = document.createElement('li');
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'filter-pill';
+          button.dataset.removeTech = slug;
+          button.setAttribute('aria-label', `Remove ${nameOf.get(slug)} from filter`);
+          button.textContent = nameOf.get(slug) ?? slug;
+          const x = document.createElement('span');
+          x.setAttribute('aria-hidden', 'true');
+          x.textContent = '×';
+          button.append(x);
+          li.append(button);
+          return li;
+        }),
+      );
+    };
+
     const apply = (selected: Set<string>, pushUrl: boolean) => {
-      timeline.dataset.filtering = String(selected.size > 0);
+      const active = selected.size > 0;
+      timeline.dataset.filtering = String(active);
+      if (bar) bar.dataset.active = String(active);
 
       let matched = 0;
       for (const entry of entries) {
@@ -49,12 +81,14 @@
       }
 
       if (countEl) {
-        countEl.textContent =
-          selected.size === 0
-            ? `${entries.length} projects`
-            : `${matched} of ${entries.length} match`;
+        countEl.textContent = describeMatch(
+          matched,
+          entries.length,
+          [...selected].map((slug) => nameOf.get(slug) ?? slug),
+        );
       }
-      resetEl?.classList.toggle('hidden', selected.size === 0);
+      renderPills(selected);
+      resetEl?.classList.toggle('hidden', !active);
 
       if (pushUrl) {
         const param = serializeTechParam(selected);
@@ -78,6 +112,23 @@
     form.addEventListener('reset', () => {
       // The reset event fires before the inputs clear, so defer a frame.
       requestAnimationFrame(() => apply(readSelection(), true));
+    });
+
+    // A pill in the bar unticks its chip, wherever the chips have scrolled to.
+    pillsEl?.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLElement>('[data-remove-tech]');
+      const box = boxes.find((b) => b.value === button?.dataset.removeTech);
+      if (!box) return;
+      box.checked = false;
+      apply(readSelection(), true);
+    });
+
+    toggleEl?.addEventListener('click', () => {
+      const expanded = form.dataset.expanded !== 'true';
+      form.dataset.expanded = String(expanded);
+      toggleEl.setAttribute('aria-expanded', String(expanded));
+      toggleEl.textContent =
+        (expanded ? toggleEl.dataset.labelLess : toggleEl.dataset.labelMore) ?? '';
     });
 
     // Restore a shared link's filter state: ?tech=react,python

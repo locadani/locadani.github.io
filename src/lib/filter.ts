@@ -90,6 +90,22 @@ export function serializeTechParam(selected: ReadonlySet<string>): string | null
   return [...selected].sort().join(',');
 }
 
+/**
+ * The results bar's sentence. It spells out the OR semantics ("React or Python")
+ * so a reader is not left guessing why selecting a second chip shows *more*.
+ * Past two names the list stops helping and the pills beside it carry the detail.
+ */
+export function describeMatch(matched: number, total: number, names: readonly string[]): string {
+  if (names.length === 0) return `${total} projects · pick a technology to filter`;
+  const what =
+    names.length === 1
+      ? names[0]
+      : names.length === 2
+        ? `${names[0]} or ${names[1]}`
+        : `any of ${names.length} technologies`;
+  return `${matched} of ${total} projects use ${what}`;
+}
+
 /** Display order and labels for the chip groups. */
 const CATEGORY_ORDER: readonly { category: TechCategory; label: string }[] = [
   { category: 'language', label: 'Languages' },

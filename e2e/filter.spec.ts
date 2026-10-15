@@ -16,11 +16,15 @@ const entries = '[data-entry]';
 const chip = (page: import('@playwright/test').Page, slug: string) =>
   page.locator(`label[for="tech-${slug}"]`);
 
+/** Technologies used only once are tucked behind "Show all" until it is pressed. */
+const showAll = (page: import('@playwright/test').Page) =>
+  page.getByRole('button', { name: /^Show all \d+ technologies$/ }).click();
+
 test('renders every project with the filter idle', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator(entries)).toHaveCount(15);
+  await expect(page.locator(entries)).toHaveCount(17);
   await expect(page.locator(timeline)).toHaveAttribute('data-filtering', 'false');
-  await expect(page.locator('[data-filter-count]')).toHaveText('15 projects');
+  await expect(page.locator('[data-filter-count]')).toContainText('17 projects');
 });
 
 test('reveals the filter once scripting is available', async ({ page }) => {
@@ -41,8 +45,8 @@ test('on a wide screen, selecting a technology collapses non-matching entries', 
   const matched = page.locator('[data-entry][data-match="true"]');
   const count = await matched.count();
   expect(count).toBeGreaterThan(0);
-  expect(count).toBeLessThan(15);
-  await expect(page.locator('[data-filter-count]')).toHaveText(`${count} of 15 match`);
+  expect(count).toBeLessThan(17);
+  await expect(page.locator('[data-filter-count]')).toHaveText(`${count} of 17 projects use React`);
 
   // A non-matching entry keeps its heading but collapses its body to nothing.
   const missBody = page.locator('[data-entry][data-match="false"]').first().locator('.entry-body');
@@ -80,7 +84,7 @@ test('every role bar spans the rows of the projects done during it', async ({ pa
   const kpmg = page.locator('.tl-role', { hasText: 'KPMG Italy' });
   const bar = (await kpmg.boundingBox())!;
 
-  for (const title of ['Anki uploader', 'Drone simulator', 'Cashflow visualization']) {
+  for (const title of ['Anki uploader', 'Proficiency assessment', 'Cashflow visualization']) {
     const project = page.locator('[data-entry]', { hasText: title }).first();
     const box = (await project.boundingBox())!;
     const centre = box.y + box.height / 2;
@@ -106,9 +110,9 @@ test('the two columns collapse to one chronological column on a phone', async ({
   // A phone should read as "here is the job, here is what I built during it".
   expect(reading.slice(0, 4)).toEqual([
     'Backwell Tech Corp',
+    'Smoke tracker',
     'Customer Intelligence',
     'MailSense',
-    'Scale-up platform',
   ]);
 
   expect(
@@ -120,6 +124,7 @@ test('the two columns collapse to one chronological column on a phone', async ({
 
 test('OR semantics: two selections widen the result set', async ({ page }) => {
   await page.goto('/');
+  await showAll(page);
   await chip(page, 'react').click();
   const afterOne = await page.locator('[data-entry][data-match="true"]').count();
   await chip(page, 'kotlin').click();
@@ -129,6 +134,7 @@ test('OR semantics: two selections widen the result set', async ({ page }) => {
 
 test('selection round-trips through the URL', async ({ page }) => {
   await page.goto('/');
+  await showAll(page);
   await chip(page, 'react').click();
   await chip(page, 'csharp').click();
   await expect(page).toHaveURL(/\?tech=csharp,react$/);
@@ -151,7 +157,7 @@ test('Clear restores the full timeline and drops the URL parameter', async ({ pa
   await page.goto('/?tech=react');
   await page.getByRole('button', { name: 'Clear' }).click();
   await expect(page.locator(timeline)).toHaveAttribute('data-filtering', 'false');
-  await expect(page.locator('[data-entry][data-match="true"]')).toHaveCount(15);
+  await expect(page.locator('[data-entry][data-match="true"]')).toHaveCount(17);
   await expect(page).not.toHaveURL(/tech=/);
 });
 
@@ -191,6 +197,7 @@ test('a phone card names the job it was built under, since the role bars are gon
 
   // A personal project states the job it was built alongside rather than an employer.
   await page.getByRole('button', { name: 'Clear' }).click();
+  await showAll(page);
   await chip(page, 'spring-boot').click();
   const anki = page.locator('[data-entry][data-match="true"]').first();
   await expect(anki).toContainText('Personal');
@@ -215,6 +222,7 @@ test('on a phone each filter category label sits on its own row above its chips'
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await showAll(page);
 
   const label = page.locator('#tech-filter p', { hasText: 'Languages' }).first();
   const firstChip = page.locator('label[for="tech-java"]');
@@ -256,7 +264,10 @@ test('a selected technology is highlighted on the cards that matched it', async 
   await page.goto('/');
   await chip(page, 'react').click();
 
-  const match = page.locator('[data-entry][data-match="true"]').first();
+  // Pinned by title: "the first match" would re-resolve to another card after Clear.
+  const match = page
+    .locator('[data-entry]')
+    .filter({ has: page.getByRole('heading', { name: 'Customer Intelligence', exact: true }) });
   const reactTag = match.locator("[data-tech-tag='react']");
   const otherTag = match.locator("[data-tech-tag='typescript']");
   const reactChip = page.locator('label[for="tech-react"]');
@@ -279,4 +290,53 @@ test('a selected technology is highlighted on the cards that matched it', async 
   await page.getByRole('button', { name: 'Clear' }).click();
   await expect(reactTag).toHaveAttribute('data-selected', 'false');
   await expect(reactTag).not.toHaveCSS('background-color', accent);
+});
+
+test('collapsed, the filter shows only technologies used more than once', async ({ page }) => {
+  await page.goto('/');
+  await expect(chip(page, 'react')).toBeVisible();
+  await expect(chip(page, 'kotlin')).toBeHidden();
+
+  await showAll(page);
+  await expect(chip(page, 'kotlin')).toBeVisible();
+  await page.getByRole('button', { name: 'Show fewer' }).click();
+  await expect(chip(page, 'kotlin')).toBeHidden();
+});
+
+test('a selected chip stays visible while the list is collapsed', async ({ page }) => {
+  // A shared link can select a rarely used technology; its chip must not vanish.
+  await page.goto('/?tech=kotlin');
+  await expect(chip(page, 'kotlin')).toBeVisible();
+});
+
+test('the results bar says what a click did and sticks while scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  await chip(page, 'react').click();
+  await chip(page, 'python').click();
+
+  const bar = page.locator('[data-filter-bar]');
+  await expect(bar.locator('[data-filter-count]')).toHaveText(/^\d+ of 17 projects use Python or React$/);
+
+  await page.mouse.wheel(0, 2000);
+  await expect.poll(async () => (await bar.boundingBox())?.y).toBe(0);
+});
+
+test('removing a pill in the results bar unticks its chip', async ({ page }) => {
+  await page.goto('/?tech=python,react');
+  await page.getByRole('button', { name: 'Remove React from filter' }).click();
+  await expect(page.locator('#tech-react')).not.toBeChecked();
+  await expect(page.locator('#tech-python')).toBeChecked();
+  await expect(page).toHaveURL(/\?tech=python$/);
+});
+
+test('on a phone, card thumbnails sit below the title instead of squeezing it', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  const card = page.locator('[data-entry]', { hasText: 'MailSense' }).first();
+  const title = (await card.locator('h3').boundingBox())!;
+  const thumbs = (await card.locator('[data-lightbox-group]').boundingBox())!;
+  expect(thumbs.y).toBeGreaterThanOrEqual(title.y + title.height);
 });
