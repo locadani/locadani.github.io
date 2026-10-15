@@ -404,13 +404,14 @@ body {
   left: 50%;
   translate: -50% -50%;
   margin: 0;
-  max-width: min(90vw, 60rem);
-  max-height: 85vh;
+  max-width: min(96vw, 64rem);
+  max-height: 92vh;
   padding: 0;
   border: none;
-  border-radius: 0.5rem;
-  background: var(--color-paper);
-  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+  /* Transparent so the close and prev/next buttons sit out on the grey
+     backdrop; .lightbox-panel is the visible card. */
+  background: transparent;
+  overflow: visible;
 }
 
 /* Scoped to [open] rather than plain `.lightbox`: an author `display`
@@ -434,21 +435,44 @@ body {
   outline: none;
 }
 
-/* Positioning context for the prev/next buttons, so they stay centered on
-   the image itself instead of the taller box once the caption is added
-   below. */
+/* Prev/next sit either side of the card, on the backdrop, so they never
+   cover any of the screenshot. */
 .lightbox-stage {
-  position: relative;
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+.lightbox-panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0.5rem;
+  background: var(--color-paper);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+  overflow: hidden;
+}
+
+/* Leaves room for the two nav buttons and their gaps (2 × 1.75rem + 2 ×
+   0.5rem) beside the card, and for the close row and caption. */
 .lightbox img {
   display: block;
-  max-width: min(90vw, 60rem);
-  max-height: calc(85vh - 4.5rem);
+  max-width: calc(min(96vw, 64rem) - 4.5rem);
+  max-height: calc(92vh - 7rem);
+}
+
+/* No caption: only the close row and the "1 / 4" counter to leave room for. */
+.lightbox:has(.lightbox-caption[hidden]) img {
+  max-height: calc(92vh - 4rem);
 }
 
 .lightbox-caption {
+  /* Wraps to the image's width instead of stretching the card (and pushing
+     the prev/next buttons away from the image) to fit a long caption. */
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
   margin: 0;
   padding: 0.5rem 1rem 0;
   text-align: center;
@@ -458,58 +482,46 @@ body {
 }
 
 .lightbox-close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  /* .lightbox-stage is also a positioned box and comes after this button in
-     the DOM, so at the shared z-index:auto layer it would otherwise paint
-     on top and swallow clicks on the corner where they overlap. */
-  z-index: 1;
+  /* Its own row above the card, right-aligned, out on the backdrop. */
+  align-self: flex-end;
+  margin-bottom: 0.5rem;
   display: flex;
-  height: 2rem;
-  width: 2rem;
+  flex-shrink: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  font-size: 0.75rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid var(--color-rule);
-  background: var(--color-paper);
-  color: var(--color-ink-soft);
+  /* White on the dark backdrop, since they sit outside the card. */
+  border: none;
+  background: transparent;
+  color: white;
   line-height: 1;
 }
 
 .lightbox-close:hover {
-  color: var(--color-ink);
-  border-color: var(--color-ink-faint);
+  background: rgb(255 255 255 / 0.15);
 }
 
 .lightbox-nav {
-  position: absolute;
-  top: 50%;
-  translate: 0 -50%;
   display: flex;
-  height: 2.5rem;
-  width: 2.5rem;
+  flex-shrink: 0;
+  height: 1.75rem;
+  width: 1.75rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid var(--color-rule);
-  background: var(--color-paper);
-  color: var(--color-ink-soft);
+  /* White on the dark backdrop, since they sit outside the card. */
+  border: none;
+  background: transparent;
+  color: white;
   font-size: 1.25rem;
   line-height: 1;
 }
 
 .lightbox-nav:hover {
-  color: var(--color-ink);
-  border-color: var(--color-ink-faint);
-}
-
-.lightbox-prev {
-  left: 0.5rem;
-}
-
-.lightbox-next {
-  right: 0.5rem;
+  background: rgb(255 255 255 / 0.15);
 }
 
 .lightbox-index {
@@ -519,6 +531,39 @@ body {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--color-ink-faint);
+}
+
+/* On wide screens the tall phone screenshots are limited by height, not
+   width, so a caption underneath would only shrink them. Move it into a
+   column beside the image instead: the card gets wider and the image gets
+   the full height of the dialog (less the close row above it). Landscape
+   images keep the caption underneath, where it costs them less. */
+@media (min-width: 48rem) {
+  .lightbox.is-portrait .lightbox-panel {
+    display: grid;
+    grid-template-columns: auto 18rem;
+    grid-template-rows: 1fr auto;
+    align-items: start;
+  }
+
+  .lightbox.is-portrait img {
+    grid-row: 1 / 3;
+    max-width: calc(min(96vw, 64rem) - 4.5rem - 18rem);
+    max-height: calc(92vh - 2rem);
+  }
+
+  .lightbox.is-portrait .lightbox-caption {
+    width: auto;
+    padding: 1.75rem 1.5rem 0;
+    text-align: left;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .lightbox.is-portrait .lightbox-index {
+    padding: 0 1.5rem 1.25rem;
+    text-align: left;
+  }
 }
 
 @media print {

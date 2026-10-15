@@ -331,6 +331,8 @@ const items = [
                       aria-label={`Open full-size image: ${img.alt}`}
                       data-lightbox-trigger
                       data-lightbox-alt={img.alt}
+                      data-lightbox-portrait={img.src.height > img.src.width ? '' : undefined}
+                      data-lightbox-no-caption={entry.data.imageCaptions ? undefined : ''}
                     >
                       <Image
                         src={img.src}

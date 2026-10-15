@@ -16,13 +16,15 @@
     <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Previous image">
       ‹
     </button>
-    <img data-lightbox-img alt="" />
+    <div class="lightbox-panel">
+      <img data-lightbox-img alt="" />
+      <p class="lightbox-caption" data-lightbox-caption></p>
+      <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
+    </div>
     <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Next image">
       ›
     </button>
   </div>
-  <p class="lightbox-caption" data-lightbox-caption></p>
-  <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
 </dialog>
 
 <script>
@@ -44,10 +46,17 @@
     const show = (index: number) => {
       current = index;
       const item = items[current];
+      // Tall images get their caption beside them on wide screens (see
+      // .lightbox.is-portrait in global.css). Flagged at build time from the
+      // source image, since the thumbnails are all cropped to landscape.
+      // With no caption there's nothing to put beside the image, so it keeps
+      // the plain stacked layout.
+      const caption = 'lightboxNoCaption' in item.dataset ? '' : (item.dataset.lightboxAlt ?? '');
+      dialog.classList.toggle('is-portrait', !!caption && 'lightboxPortrait' in item.dataset);
       img.src = item.href;
       img.alt = item.dataset.lightboxAlt ?? '';
-      captionEl.textContent = item.dataset.lightboxAlt ?? '';
-      captionEl.hidden = !item.dataset.lightboxAlt;
+      captionEl.textContent = caption;
+      captionEl.hidden = !caption;
 
       const hasMultiple = items.length > 1;
       prevBtn.hidden = !hasMultiple;
@@ -83,16 +92,11 @@
       else if (e.key === 'ArrowRight' && !nextBtn.hidden) step(1);
     });
 
-    // The backdrop has no element of its own to listen on, so a click
-    // outside the dialog's own box (rather than its content) closes it.
+    // The dialog itself is transparent (only .lightbox-panel is the visible
+    // card, with the buttons out on the backdrop), so any click that isn't
+    // on the card or a button reads as a click on the grey and closes it.
     dialog.addEventListener('click', (e) => {
-      const rect = dialog.getBoundingClientRect();
-      const inside =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
-      if (!inside) dialog.close();
+      if (!(e.target as Element).closest('.lightbox-panel, button')) dialog.close();
     });
   }
 </script>

@@ -5,6 +5,7 @@ start: 2026-10
 repo: https://github.com/locadani/smoke-tracker
 summary: An installable web app for logging cigarette smoke drifting into our apartment from neighbours, in about five seconds from a phone. Months of reports build a detailed, tamper-evident record that could support a formal complaint.
 tech: [rust, axum, htmx, postgresql, sqlite, docker, google-cloud, terraform, github-actions]
+imageCaptions: false
 images:
   - src: ./smoke-tracker-log.png
     alt: The Log screen on a phone, with a smell event in progress banner and this month's counts of events, reports, bedroom days and clean checks.

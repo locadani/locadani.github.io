@@ -57,6 +57,10 @@ const projects = defineCollection({
         repo: z.url().optional(),
         /** Screenshots or diagrams, colocated with the entry (e.g. `./foo.svg`). */
         images: z.array(z.object({ src: image(), alt: z.string() })).optional(),
+        /** Show each image's alt text as a caption in the lightbox. Turn off
+            when the screenshots speak for themselves; the alt text stays for
+            screen readers either way. */
+        imageCaptions: z.boolean().default(true),
       })
       .refine(endNotBeforeStart, endNotBeforeStartError),
 });
