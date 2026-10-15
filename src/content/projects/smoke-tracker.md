@@ -5,6 +5,15 @@ start: 2026-10
 repo: https://github.com/locadani/smoke-tracker
 summary: An installable web app for logging cigarette smoke drifting into our apartment from neighbours, in about five seconds from a phone. Months of reports build a detailed, tamper-evident record that could support a formal complaint.
 tech: [rust, axum, htmx, postgresql, sqlite, docker, google-cloud, terraform, github-actions]
+images:
+  - src: ./smoke-tracker-log.png
+    alt: The Log screen on a phone, with a smell event in progress banner and this month's counts of events, reports, bedroom days and clean checks.
+  - src: ./smoke-tracker-log-level.png
+    alt: Logging a report, with the bedroom ticked and level 7 picked, and the level's meaning shown underneath, "Very strong. Can't stay comfortably; smell builds up."
+  - src: ./smoke-tracker-graphs.png
+    alt: The graphs screen for the last 30 days, plotting nightly smell intensity against PM2.5 readings that rise and fall together.
+  - src: ./smoke-tracker-event.png
+    alt: One evening's event, with a timeline of two smell reports, rooms and symptoms, and a PM2.5 reading.
 ---
 
 Each report records the rooms checked with a 0–10 smell level, symptoms, and an optional
