@@ -1,6 +1,6 @@
 # locadani.github.io
 
-Personal site and portfolio — [locadani.github.io](https://locadani.github.io)
+Personal site and portfolio: [locadani.github.io](https://locadani.github.io)
 
 Built with [Astro](https://astro.build) and Tailwind CSS. Static output, no
 client-side framework: the only JavaScript on the page is ~3.5 KB driving the
@@ -18,7 +18,7 @@ npx playwright test   # filter interaction tests
 
 ## Adding a project or a job
 
-Add one Markdown file. Nothing else needs touching — the timeline, the ordering
+Add one Markdown file. Nothing else needs touching: the timeline, the ordering
 and the filter chips all follow from the content.
 
 ```
@@ -42,7 +42,7 @@ Optional longer body in Markdown, shown under the summary.
 ```
 
 Every `tech` slug must exist in [`src/data/tech.ts`](src/data/tech.ts). Adding a
-technology means adding it there first — an unknown slug fails the build on
+technology means adding it there first, since an unknown slug fails the build on
 purpose, so a typo can never produce an entry the filter silently ignores.
 Filter chips are derived from the slugs actually in use, so a new technology's
 chip appears by itself.
@@ -68,7 +68,7 @@ src/
   content/
     experience/    one Markdown file per role or degree
     projects/      one Markdown file per project
-  content.config.ts  Zod schemas — the build fails on bad content
+  content.config.ts  Zod schemas; the build fails on bad content
   data/
     tech.ts        canonical technology registry
     site.ts        name, tagline, links, languages

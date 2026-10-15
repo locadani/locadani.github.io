@@ -3,7 +3,7 @@
  * The filter's only client-side code.
  *
  * It reads checkbox state, delegates the decision to the pure functions in
- * lib/filter.ts, and writes two attributes — `data-filtering` on the root and
+ * lib/filter.ts, and writes two attributes: `data-filtering` on the root and
  * `data-match` on each entry. All dimming and collapsing is CSS. That is why
  * there is no framework here: the DOM work is genuinely this small.
  *
@@ -74,7 +74,7 @@
         if (isMatch) matched += 1;
       }
 
-      // Show which tag earned the match. One generic loop — the accent itself is
+      // Show which tag earned the match. One generic loop; the accent itself is
       // defined once in CSS, shared with the chip that selected it.
       for (const tag of tags) {
         tag.dataset.selected = String(selected.has(tag.dataset.techTag ?? ''));

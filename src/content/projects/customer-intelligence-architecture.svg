@@ -10,7 +10,7 @@
 
     <!-- ===================== Customer Intelligence: per-tenant boundary ===================== -->
     <rect x="24" y="36" width="584" height="240" rx="10" fill="none" stroke="#dee0e4" stroke-width="1.5" stroke-dasharray="5 4" />
-    <text x="316" y="54" text-anchor="middle" font-size="10" letter-spacing="0.05em" fill="#86898f">CUSTOMER INTELLIGENCE — PER-TENANT · ROW-LEVEL SECURITY</text>
+    <text x="316" y="54" text-anchor="middle" font-size="10" letter-spacing="0.05em" fill="#86898f">CUSTOMER INTELLIGENCE · PER-TENANT · ROW-LEVEL SECURITY</text>
 
     <!-- pipeline row -->
     <rect x="44" y="90" width="104" height="70" rx="8" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5" />
@@ -71,6 +71,6 @@
     <line x1="1122" y1="145" x2="996" y2="145" stroke="#52555c" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)" />
     <text x="1059" y="160" text-anchor="middle" font-size="10.5" fill="#52555c">delivery webhook</text>
 
-    <text x="660" y="306" text-anchor="middle" font-size="11.5" fill="#86898f">Letter dispatch is a separate deployment with its own tenancy — only it talks to Pingen.</text>
+    <text x="660" y="306" text-anchor="middle" font-size="11.5" fill="#86898f">Letter dispatch is a separate deployment with its own tenancy; only it talks to Pingen.</text>
   </g>
 </svg>

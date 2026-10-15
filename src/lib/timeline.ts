@@ -9,7 +9,7 @@
  *
  * Rows are content-sized rather than proportional to elapsed time. A strictly
  * proportional axis would spend most of its height on the quiet years and
- * squeeze the recent, dense ones — the opposite of what a reader needs.
+ * squeeze the recent, dense ones, the opposite of what a reader needs.
  *
  * Pure and DOM-free, so the alignment rules are unit-tested rather than
  * eyeballed in a browser.
@@ -59,7 +59,7 @@ const NEWEST_FIRST = (a: string, b: string) => b.localeCompare(a);
 
 /**
  * Was this role held at that date? Exported because the filtered view hides the
- * role bars, so each surviving project card has to state its own context — and
+ * role bars, so each surviving project card has to state its own context, and
  * that context is exactly "which role covered this project's date".
  */
 export function roleCovers(role: RoleInput, date: string): boolean {
@@ -80,7 +80,7 @@ export function layoutTimeline(
     .map((p) => ({ date: p.start, project: p.id }));
 
   // A role whose range contains no project would otherwise have nothing to span.
-  // That is not an edge case to shrug at — it happens the moment a new job is
+  // That is not an edge case to shrug at: it happens the moment a new job is
   // added before any of its projects. Give it an anchor row of its own, inserted
   // in date order so it still lands in the right place chronologically.
   const uncovered = [...roles]

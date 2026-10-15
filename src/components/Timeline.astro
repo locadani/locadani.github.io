@@ -9,7 +9,7 @@ import { techName } from '../data/tech';
 const roleEntries = await getCollection('experience');
 const projectEntries = await getCollection('projects');
 
-// One shared set of grid rows for both columns — this is what makes "that
+// One shared set of grid rows for both columns. This is what makes "that
 // project happened inside that job" true geometrically. See lib/timeline.ts.
 const layout = layoutTimeline(
   roleEntries.map((r) => ({ id: r.id, start: r.data.start, end: r.data.end })),
@@ -27,11 +27,11 @@ const chipCount = chipGroups.reduce((n, group) => n + group.chips.length, 0);
 
 /**
  * Which organisation a project sits under. Filtering hides the role bars, so a
- * surviving card has to carry its own context — otherwise "what was I doing when
+ * surviving card has to carry its own context, otherwise "what was I doing when
  * I built this" is lost exactly when the reader has narrowed down to it.
  *
  * A project with its own `org` uses it. Otherwise, if a role was held at that
- * date, the card says so — which is how a personal project shows that it was
+ * date, the card says so, which is how a personal project shows that it was
  * built alongside a job.
  */
 function contextFor(entry: (typeof projectEntries)[number]): string | undefined {
@@ -73,7 +73,7 @@ const projects = await Promise.all(
 
 /**
  * DOM order drives the single-column mobile layout, where the CSS grid placement
- * is switched off. Sorting by row — roles first at a tie — makes a phone read as
+ * is switched off. Sorting by row (roles first at a tie) makes a phone read as
  * "here is the job, and here is what I built during it", which is the same story
  * the two columns tell on a wide screen.
  */
@@ -95,11 +95,11 @@ const items = [
     Projects &amp; career
   </h2>
   {/* The caption has to be true in every state: there are no columns on a phone,
-      and no role bars at all once a phone is filtered — hence tl-hint. */}
+      and no role bars at all once a phone is filtered, hence tl-hint. */}
   <p class="tl-hint mt-2 max-w-2xl text-sm text-(--color-ink-faint)">
     <span class="md:hidden">Each role, followed by what I built during it.</span>
     <span class="hidden md:inline"
-      >What I built on the left, the role I held on the right — aligned, so you can
+      >What I built on the left, the role I held on the right, aligned so you can
       see what I did when.</span
     >
   </p>
@@ -111,7 +111,7 @@ const items = [
     <fieldset>
       <legend class="text-sm text-(--color-ink-soft)">
         Filter by technology <span class="text-(--color-ink-faint)"
-          >— projects using any of them</span
+          >(projects using any of them)</span
         >
       </legend>
 
@@ -172,7 +172,7 @@ const items = [
   </form>
 
   <!-- The answer to "what did that click do?". It sits directly under the chips
-       and, while a filter is on, sticks to the top of the screen — so the result
+       and, while a filter is on, sticks to the top of the screen, so the result
        count and the way back out stay in view however far the reader scrolls. -->
   <div
     class="filter-bar no-print hidden mt-5 -mx-6 px-6 py-2.5 md:-mx-3 md:px-3"
@@ -285,7 +285,7 @@ const items = [
             />
 
             {/* Thumbnails sit beside the title where there is room, and drop below
-                it on a phone — beside it they would squeeze the title to a sliver. */}
+                it on a phone; beside it they would squeeze the title to a sliver. */}
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
               <div class="min-w-0 flex-1">
                 <h3 class="entry-title leading-snug font-semibold">

@@ -1,8 +1,8 @@
-# Portfolio Site — Design
+# Portfolio Site: Design
 
 **Date:** 2026-08-18
 **Repo:** locadani.github.io
-**Status:** Implemented. Revised 2026-08-18 — see Revisions.
+**Status:** Implemented. Revised 2026-08-18; see Revisions.
 
 ## Goal
 
@@ -67,30 +67,30 @@ Name, one-line positioning, location, languages, two links.
   Turkish and Japanese (A2) omitted as noise for this audience.
 - Links: LinkedIn, GitHub. No email, no phone, per explicit decision.
 
-### 2. Career & projects — one merged timeline
+### 2. Career & projects: one merged timeline
 
 **Revised.** The original design put projects alone on the timeline with a separate
 Experience block above it. That answered "what did they build" but left the reader to
 join two lists mentally to learn *when*. The two are now one two-column timeline sharing
 a single set of rows:
 
-- **Left column, and the wider one (1.7fr)** — projects, one per row, at their own dates.
+- **Left column, and the wider one (1.7fr)**: projects, one per row, at their own dates.
   Projects are the focus of the page, so they get the space; each carries a dot on its
   inner edge, pinned to the axis.
-- **Centre column** — the year axis and a continuous spine. Year labels sit on a paper
+- **Centre column**: the year axis and a continuous spine. Year labels sit on a paper
   background so they punch through the spine rather than colliding with it.
-- **Right column (1fr)** — each role as a card with a vertical **rail whose length is the
+- **Right column (1fr)**: each role as a card with a vertical **rail whose length is the
   job's real duration**, marked with start and end ticks, offset 40px from the axis so the
   duration bars never read as part of the spine itself. The card is sticky within its
   span, so the job stays visible beside every project belonging to it.
 
 The point is geometric rather than stated: a project built during a job physically sits
-beside that job's bar. It also surfaces something a two-list layout hides — that the Anki
+beside that job's bar. It also surfaces something a two-list layout hides: that the Anki
 uploader and the drone simulator were built while employed at KPMG.
 
 Row assignment lives in `src/lib/timeline.ts` as a pure, unit-tested function. Rows are
 **content-sized, not proportional to elapsed time**: a strictly proportional axis would
-spend most of its height on the quiet years and squeeze the recent, dense ones — the
+spend most of its height on the quiet years and squeeze the recent, dense ones, the
 opposite of what a reader needs.
 
 A role whose date range contains no projects gets an anchor row of its own, inserted in
@@ -98,7 +98,7 @@ date order. This is not a hypothetical: it happens the moment a new job is added
 any of its projects, and without it the bar would have no rows to span.
 
 **On a phone** the grid switches off and the page becomes one column following DOM order,
-which the component sorts into "here is the job, here is what I built during it" — the
+which the component sorts into "here is the job, here is what I built during it", the
 same story the two columns tell on a wide screen.
 
 ### 4. Footer
@@ -122,7 +122,7 @@ of chronology survive filtering, and there is no jarring reflow. A live count
 across all projects, ordered by frequency and then alphabetically for ties, so the order
 is stable across builds.
 
-**Grouped by category** — Languages, Frameworks, Data, Infrastructure, AI, Tooling — using
+**Grouped by category** (Languages, Frameworks, Data, Infrastructure, AI, Tooling), using
 the `category` already carried by every registry entry. Flat, the 42 chips filled eleven
 rows on a phone and buried the first timeline entry; grouped, a reader looking for a
 language scans one short labelled row. Empty groups are dropped rather than rendered as
@@ -133,20 +133,20 @@ its chip appear automatically; no second list to maintain.
 `data-tech="react typescript"`. A small vanilla TypeScript script (~1 KB) reads the
 checkbox state, sets `data-match="true|false"` on each entry and `data-filtering` on the
 timeline root; CSS handles all dimming, collapsing, and transitions. A React island was
-considered and rejected — it would be the only JS framework on the site, for a feature
+considered and rejected: it would be the only JS framework on the site, for a feature
 that is attribute toggling.
 
 **URL state.** Selected chips sync to `?tech=react,python`, and the page reads that
-param on load. This makes a filtered view linkable — a message to a recruiter can point
+param on load. This makes a filtered view linkable: a message to a recruiter can point
 at exactly the subset of work in their stack. Uses `history.replaceState`, so it never
 pollutes the back button.
 
-**Scope.** The filter narrows projects only. Role bars are never dimmed or collapsed — a
+**Scope.** The filter narrows projects only. Role bars are never dimmed or collapsed; a
 recruiter filtering by React must not appear to erase the career history. Their rails do
 shorten as project rows collapse, which keeps the alignment honest.
 
 **Known gap.** Chips derive from projects, so technologies appearing only in a role's
-description — Azure, Bicep, MongoDB, Entra ID, Railway, GitHub Actions — have no chip.
+description (Azure, Bicep, MongoDB, Entra ID, Railway, GitHub Actions) have no chip.
 Now that roles sit on the same timeline this is more visible: a reader can see "Azure" on
 the KPMG card and find no Azure chip. Padding project tags with technologies those
 projects did not use would be a lie, so the honest options are a separate "also worked
@@ -176,7 +176,7 @@ Without this registry, `React` / `react` / `ReactJS` drift into the content with
 weeks, and the derived chip list fills with near-duplicates that each match a different
 subset. The registry makes that class of bug impossible.
 
-The registry holds **technologies only** — things a recruiter would filter by. Topics and
+The registry holds **technologies only**: things a recruiter would filter by. Topics and
 domains (computer vision, GPU computing, multi-tenancy) are not slugs; they belong in an
 entry's prose summary. A filter chip reading "computer vision" would match on subject
 matter rather than skill and dilute the one job the filter has. Multi-word technologies
@@ -197,12 +197,12 @@ Steps 1–3 happen at build; 4–5 are the only runtime work.
 The realistic failure mode for a content-driven site is a silent content typo, not a
 runtime exception. So the build is the guard:
 
-- **Unknown tech slug** — Zod enum rejects it, build fails with the offending file and
+- **Unknown tech slug**: Zod enum rejects it, build fails with the offending file and
   value. A project tagged `Reactjs` can never silently become unfilterable.
-- **Malformed or missing date** — build fails rather than producing an entry that sorts
+- **Malformed or missing date**: build fails rather than producing an entry that sorts
   to an arbitrary position.
-- **`end` before `start`** — build fails.
-- **Missing required field** — build fails, naming the file.
+- **`end` before `start`**: build fails.
+- **Missing required field**: build fails, naming the file.
 
 At runtime there is nothing to fail: the filter degrades to "no filter" if the script
 does not load.
@@ -218,12 +218,12 @@ Timeline spine and tech chips carry the visual interest. Restraint everywhere el
 
 ## Accessibility
 
-- Filter is a real `<fieldset>` of `<input type="checkbox">` — keyboard-navigable and
+- Filter is a real `<fieldset>` of `<input type="checkbox">`, keyboard-navigable and
   screen-reader-legible without ARIA gymnastics
 - Match count in an `aria-live="polite"` region, so filtering is announced
 - Timeline is an ordered list (`<ol>`), because chronological order is meaning
 - `prefers-reduced-motion` disables the collapse transition
-- Dimmed stubs stay above 4.5:1 contrast — "de-emphasised" must not mean unreadable
+- Dimmed stubs stay above 4.5:1 contrast; "de-emphasised" must not mean unreadable
 - Visible focus rings, never removed
 
 ## SEO
@@ -249,7 +249,7 @@ A Lighthouse pass before first deploy, targeting 100 on accessibility and SEO.
 
 ## Deployment
 
-`.github/workflows/deploy.yml` — `withastro/action` to build, `actions/deploy-pages` to
+`.github/workflows/deploy.yml`: `withastro/action` to build, `actions/deploy-pages` to
 publish, triggered on push to `main`.
 
 Two things to get right:
@@ -262,7 +262,7 @@ Two things to get right:
 
 **Blocked on the user:** the `gh` CLI in this environment is authenticated as
 `locatelli-d`, and `github.com/locadani/locadani.github.io` returns 404 to that account.
-Daniele will run `gh auth login` as `locadani` — this is interactive and cannot be
+Daniele will run `gh auth login` as `locadani`; this is interactive and cannot be
 automated from here. All local work can proceed before this is resolved.
 
 ## Removing the Particle theme
@@ -278,67 +278,67 @@ src/  assets/  particle.jpg  index.html  LICENSE.txt
 `LICENSE.txt` is Nathan Randecker's MIT licence covering the code being removed, so it
 goes with it. `README.md` is rewritten to describe the new site.
 
-Git history preserves everything — recoverable at commit `57314c5`. Confirm with the
+Git history preserves everything, recoverable at commit `57314c5`. Confirm with the
 user before deleting.
 
 ## Timeline content inventory
 
 15 entries spanning 2020–2026, which is what makes the filter worth building.
 
-### Work — Backwell Tech Corp (Nov 2025 – present)
+### Work: Backwell Tech Corp (Nov 2025 – present)
 
 | Project | Tech |
 | --- | --- |
-| MailSense — multi-tenant email automation platform; migrated from single-tenant to multi-tenant (master DB routing to per-tenant databases), IMAP/SMTP and Microsoft Graph ingestion, per-tenant object storage, legacy MVC dashboard being retired | C#, .NET, ASP.NET Core, PostgreSQL, Docker, MinIO, Microsoft Graph |
-| Customer Intelligence — multi-tenant SaaS for printed-letter campaigns: CSV import and geocoding, map segmentation, prospect discovery, personalised landing pages and letters, churn/CLV predictions, Stripe-backed credit ledger, per-tenant feature flags, four locales | Next.js, React, TypeScript, Supabase, PostgreSQL, Tailwind, Stripe, OpenAI, Leaflet, Vitest |
-| Scale-up platform — modular platform shell composing production intelligence, M&A, design studio and reporting modules; interactive 3D machine model with a RAG agent grounded on filtered CAD component data; load-tested | Next.js, React, TypeScript, Supabase, three.js, OpenAI, Mistral, AWS S3, Playwright, k6 |
+| MailSense: multi-tenant email automation platform; migrated from single-tenant to multi-tenant (master DB routing to per-tenant databases), IMAP/SMTP and Microsoft Graph ingestion, per-tenant object storage, legacy MVC dashboard being retired | C#, .NET, ASP.NET Core, PostgreSQL, Docker, MinIO, Microsoft Graph |
+| Customer Intelligence: multi-tenant SaaS for printed-letter campaigns: CSV import and geocoding, map segmentation, prospect discovery, personalised landing pages and letters, churn/CLV predictions, Stripe-backed credit ledger, per-tenant feature flags, four locales | Next.js, React, TypeScript, Supabase, PostgreSQL, Tailwind, Stripe, OpenAI, Leaflet, Vitest |
+| Scale-up platform: modular platform shell composing production intelligence, M&A, design studio and reporting modules; interactive 3D machine model with a RAG agent grounded on filtered CAD component data; load-tested | Next.js, React, TypeScript, Supabase, three.js, OpenAI, Mistral, AWS S3, Playwright, k6 |
 
-### Work — KPMG Italy (Oct 2024 – Oct 2025)
+### Work: KPMG Italy (Oct 2024 – Oct 2025)
 
 | Project | Tech |
 | --- | --- |
-| Cashflow visualization — frontend tool to visualise company cashflow across the year with filtering and transaction drill-down | React, TypeScript |
+| Cashflow visualization: frontend tool to visualise company cashflow across the year with filtering and transaction drill-down | React, TypeScript |
 
 ### Personal
 
 | Project | When | Tech |
 | --- | --- | --- |
-| Anki uploader — CLI that generates AI-enhanced flashcards into custom Anki decks; built to apply a Spring Boot course | Aug 2025 – Jan 2026 | Java, Spring Boot, Spring AI, OpenAI, SQLite, Gradle |
+| Anki uploader: CLI that generates AI-enhanced flashcards into custom Anki decks; built to apply a Spring Boot course | Aug 2025 – Jan 2026 | Java, Spring Boot, Spring AI, OpenAI, SQLite, Gradle |
 | Drone simulator | Aug 2025 | C++, GLSL |
-| Smoky — Android app deployed at a local restaurant: menu, orders, payments | Jul 2020 – Apr 2021 | Kotlin, Firebase |
+| Smoky: Android app deployed at a local restaurant: menu, orders, payments | Jul 2020 – Apr 2021 | Kotlin, Firebase |
 
 ### Research
 
 | Project | When | Tech |
 | --- | --- | --- |
-| Graph neural networks for chemistry at Fujitsu — adapted GNN models to a chemistry problem, investigated pre-training hyperparameter influence on fine-tuning accuracy, presented at a research workshop | Jan – Aug 2024 | Python, PyTorch Geometric |
-| M.Sc. thesis — state-of-the-art analysis of GPU computing with Rust | 2023 | Rust |
+| Graph neural networks for chemistry at Fujitsu: adapted GNN models to a chemistry problem, investigated pre-training hyperparameter influence on fine-tuning accuracy, presented at a research workshop | Jan – Aug 2024 | Python, PyTorch Geometric |
+| M.Sc. thesis: state-of-the-art analysis of GPU computing with Rust | 2023 | Rust |
 
 ### Academic
 
 | Project | When | Tech |
 | --- | --- | --- |
-| IACV MultiDendroCut — optimal multi-level dendrogram cut for agglomerative-clustering segmentation | 2023 | MATLAB |
+| IACV MultiDendroCut: optimal multi-level dendrogram cut for agglomerative-clustering segmentation | 2023 | MATLAB |
 | Computer graphics exercises | 2022 | C++, GLSL |
-| SeaDronesSee — maritime object detection | 2022 | Python |
+| SeaDronesSee: maritime object detection | 2022 | Python |
 | DB2 course project | 2022 | Java, SQL |
-| ImageEqualizer — hardware image equaliser | 2021 | VHDL |
+| ImageEqualizer: hardware image equaliser | 2021 | VHDL |
 | Agile software engineering group project | 2020 | Java |
 
 ## Open items for the user
 
-1. **Confidentiality review — required before publishing.** The three Backwell projects
+1. **Confidentiality review, required before publishing.** The three Backwell projects
    and the KPMG cashflow tool are employer work. The descriptions above are written at
    capability level and name no clients, but Daniele must confirm each is shareable.
    Two internal client/partner names were encountered while surveying those repos and
    are deliberately excluded from this document as well as from the site. They must
-   stay excluded — this file is published in a public repository.
+   stay excluded: this file is published in a public repository.
 2. **Repo READMEs.** The site links to `github.com/locadani`, so recruiters will look.
    Several public repos have no description and bare READMEs. Worth a pass; out of scope
    for this spec.
 3. **Academic project details.** Technology tags for every public repo were read from
    GitHub's language stats and build files, so they are accurate. **Dates** are a
-   different matter — they are inferred from repo creation timestamps and course years,
+   different matter: they are inferred from repo creation timestamps and course years,
    and several are approximate. Correct any that matter.
 4. **Summaries for four entries are thin**, because the repos carry no description and
    little README: drone simulator, computer graphics exercises, the DB2 project, and the
@@ -348,7 +348,7 @@ user before deleting.
 
 ## Revisions
 
-### 2026-08-18 — merged the two sections into one aligned timeline
+### 2026-08-18: merged the two sections into one aligned timeline
 
 Superseded the original "projects-only timeline, separate Experience block" decision at
 Daniele's request: *"I want the career and projects info on two columns and the timeline
@@ -358,7 +358,7 @@ What changed:
 
 - `Experience.astro` deleted; roles and projects now render from one component over a
   shared grid.
-- Added `src/lib/timeline.ts` — pure row assignment, 10 unit tests.
+- Added `src/lib/timeline.ts`: pure row assignment, 10 unit tests.
 - Filter chips grouped by category, fixing the eleven-row chip block on mobile.
 - Page containers widened from `max-w-3xl` to `max-w-5xl` to hold two columns, with hero
   prose still constrained for readability.
@@ -366,7 +366,7 @@ What changed:
 What did not change: content, schemas, the technology registry, filter semantics, the
 build-time guards, and the decision to keep contact to LinkedIn and GitHub only.
 
-### 2026-08-18 — projects moved to the wider left column
+### 2026-08-18: projects moved to the wider left column
 
 Roles and projects swapped sides at Daniele's request: *"I want the projects on the left
 with bigger space and the experience on the right. The projects are the focus here."*
@@ -378,14 +378,14 @@ column.
 
 Confirmed with Daniele: the four employer projects are described on the site but link to
 no source, because that code is private. Only the eight public personal and university
-repositories carry links. `Smoky` has no link at all — the code lives in three private
+repositories carry links. `Smoky` has no link at all; the code lives in three private
 repositories owned by a collaborator, and the project also had an iOS client that the CV
 does not mention.
 
-### 2026-08-18 — filtering behaves differently on a phone
+### 2026-08-18: filtering behaves differently on a phone
 
 On a phone a dimmed stub still costs a scroll, which defeats the point of filtering,
-so phones now remove non-matching entries outright — along with the role bars, spine
+so phones now remove non-matching entries outright, along with the role bars, spine
 and year markers, which would no longer align with anything once rows are gone.
 
 Wide screens keep the original dim-and-collapse: there is room for the spine, and the
@@ -393,7 +393,7 @@ retained rows are what keep each role bar aligned with the projects beside it. T
 split is a single `max-width: 767px` media query.
 
 Because the role bars disappear on a filtered phone, **every project card now states the
-role it was built under** — `Work · Backwell Tech Corp`, or `Personal · while at KPMG
+role it was built under**: `Work · Backwell Tech Corp`, or `Personal · while at KPMG
 Italy` for a side project built alongside a job. The "while at" relationship is derived
 from the same span data the columns are drawn from, via `roleCovers`, so the two can
 never disagree. The narrowest covering role wins, otherwise the multi-year degree would
@@ -404,7 +404,7 @@ longer on screen: the section caption and the "roles shown as bars" footnote.
 
 Filter category labels also take their own row above their chips on a phone.
 
-### 2026-08-18 — the matching tag is highlighted on each card
+### 2026-08-18: the matching tag is highlighted on each card
 
 Selecting a technology now also highlights that technology's tag on every card, in the
 same accent as the chip, so the reader connects "I picked React" to "this is the React on
@@ -417,7 +417,7 @@ The accent is declared **once**, in a single rule shared by the chip and the tag
 .tech-tag[data-selected='true'] { background: var(--color-accent); ... }
 ```
 
-A first attempt generated one `:has()` rule per technology — 42 selectors — which is
+A first attempt generated one `:has()` rule per technology (42 selectors), which is
 exactly the repetition this avoids. The script instead sets `data-selected` on tags in one
 generic loop, matching how it already sets `data-match` on entries: attributes from
 script, appearance from CSS, one source of truth for the colour.

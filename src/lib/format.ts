@@ -12,7 +12,7 @@ export function formatMonth(value: string): string {
 
 /** `end` absent means ongoing. */
 export function formatRange(start: string, end?: string): string {
-  if (!end) return `${formatMonth(start)} — present`;
+  if (!end) return `${formatMonth(start)} – present`;
   if (start === end) return formatMonth(start);
   const [startYear] = start.split('-');
   const [endYear] = end.split('-');

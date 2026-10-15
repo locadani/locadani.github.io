@@ -11,7 +11,7 @@ describe('formatMonth', () => {
 
 describe('formatRange', () => {
   it('marks a missing end as ongoing', () => {
-    expect(formatRange('2025-11')).toBe('Nov 2025 — present');
+    expect(formatRange('2025-11')).toBe('Nov 2025 – present');
   });
 
   it('collapses a single month', () => {

@@ -10,7 +10,7 @@ const timeline = '[data-timeline]';
 const entries = '[data-entry]';
 
 /**
- * Click the chip's label, which is what a real user clicks — the checkbox itself
+ * Click the chip's label, which is what a real user clicks; the checkbox itself
  * is visually hidden for screen-reader support.
  */
 const chip = (page: import('@playwright/test').Page, slug: string) =>
@@ -213,7 +213,7 @@ test('filtering a phone leaves nothing to scroll past', async ({ page }) => {
   await page.waitForTimeout(200);
   const filtered = await page.evaluate(() => document.body.scrollHeight);
 
-  // The page must actually get shorter — the whole point of the change.
+  // The page must actually get shorter. That is the whole point of the change.
   expect(filtered).toBeLessThan(unfiltered / 2);
 });
 
@@ -281,7 +281,7 @@ test('a selected technology is highlighted on the cards that matched it', async 
   await expect(reactTag).toHaveCSS('background-color', accent);
 
   // The tag and the chip that selected it share one colour because they share one
-  // CSS rule — that is the property worth pinning down.
+  // CSS rule, and that is the property worth pinning down.
   await expect(reactChip).toHaveCSS('background-color', accent);
 
   // An unselected neighbour on the same card stays plain.

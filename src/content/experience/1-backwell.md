@@ -10,4 +10,4 @@ tech: [nextjs, react, typescript, csharp, dotnet, postgresql, supabase, railway,
 - Migrated a C# application from single-tenant to multi-tenant
 - Built on Supabase across database, storage buckets and authentication
 - Integrated Stripe payments and a credit-based billing model
-- Work assisted by AI tooling — Claude Code, Skills, MCP
+- Work assisted by AI tooling: Claude Code, Skills, MCP

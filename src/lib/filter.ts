@@ -17,7 +17,7 @@ export interface Filterable {
 export interface Chip {
   readonly slug: TechSlug;
   readonly name: string;
-  /** How many entries use it — drives chip order. */
+  /** How many entries use it; drives chip order. */
   readonly count: number;
 }
 
@@ -28,7 +28,7 @@ function isTechSlug(value: string): value is TechSlug {
 /**
  * OR semantics: an entry matches if it uses *any* selected technology.
  *
- * AND was considered and rejected — most pairs of technologies never co-occur in
+ * AND was considered and rejected: most pairs of technologies never co-occur in
  * one project, so an AND filter would return empty sets and read as broken.
  *
  * An empty selection means "no filter", so everything matches.
@@ -40,7 +40,7 @@ export function matches(entry: Filterable, selected: ReadonlySet<string>): boole
 
 /**
  * The chip list, derived from the technologies actually in use rather than
- * authored by hand — so adding a project with a new technology makes its chip
+ * authored by hand, so adding a project with a new technology makes its chip
  * appear with no second list to maintain.
  *
  * Ordered by descending usage, then alphabetically. The tie-break matters: it
@@ -62,7 +62,7 @@ export function chipsFor(entries: readonly Filterable[]): Chip[] {
 /**
  * Read a selection from `?tech=react,python`.
  *
- * Forgiving by design — a URL is user-editable and may be stale, so blanks,
+ * Forgiving by design: a URL is user-editable and may be stale, so blanks,
  * duplicates and unknown slugs are dropped rather than producing a chip that
  * filters nothing out.
  *

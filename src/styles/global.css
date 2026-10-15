@@ -112,7 +112,7 @@ body {
 
 @media (min-width: 768px) {
   .tl {
-    /* Projects lead and get the wider column — they are the point of the page.
+    /* Projects lead and get the wider column; they are the point of the page.
        Roles are supporting context, so they take the narrower one. */
     grid-template-columns: minmax(0, 1.7fr) 3.5rem minmax(0, 1fr);
     column-gap: 0;
@@ -144,7 +144,7 @@ body {
 
   .tl-role {
     grid-column: 3;
-    /* The bar spans its whole duration — that span is the point of the layout. */
+    /* The bar spans its whole duration; that span is the point of the layout. */
     grid-row: var(--row-start) / var(--row-end);
     position: relative;
     margin: 0;
@@ -186,7 +186,7 @@ body {
     bottom: 0;
   }
 
-  /* Education spans years but is not a job — quieter rail. */
+  /* Education spans years but is not a job, so a quieter rail. */
   .tl-role[data-kind='education'] .tl-rail {
     background: var(--color-rule);
     width: 1px;
@@ -226,7 +226,7 @@ body {
      room for the spine, and keeping the rows means the role bars still align
      with the projects beside them.
    - Phones remove them outright. A stub still costs a scroll, which is exactly
-     what filtering is meant to save — so the role bars, spine and year markers
+     what filtering is meant to save, so the role bars, spine and year markers
      go too, and each surviving card carries its own "Work · Backwell Tech Corp"
      context instead.
    --------------------------------------------------------------------------- */
@@ -271,7 +271,7 @@ body {
     display: none;
   }
 
-  /* Both hints describe an unfiltered timeline — "each role, followed by what I
+  /* Both hints describe an unfiltered timeline ("each role, followed by what I
      built during it" and "roles shown as bars". Once a phone is filtered there
      are no roles and no bars on screen, so the lines would simply be untrue. */
   section:has(.tl[data-filtering='true']) .tl-hint {
@@ -315,7 +315,7 @@ body {
 }
 
 /* The checkbox itself is visually hidden but fully present for keyboard and
-   screen-reader users — the chip label is what is painted. */
+   screen-reader users; the chip label is what is painted. */
 .chip-input:focus-visible + .chip {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -323,7 +323,7 @@ body {
 
 /* Collapsed filter: the groups dissolve into one flat row of the technologies
    used in more than one project. Forty-odd pills were two full phone screens,
-   which pushed the results — the answer to the click — out of sight. A chip
+   which pushed the results (the answer to the click) out of sight. A chip
    that is selected (say, from a shared link) stays visible regardless. */
 [data-expanded='false'] .chip-groups {
   display: flex;
@@ -381,7 +381,7 @@ body {
 }
 
 /* The accent is defined once, here, for both the chip you select and the matching
-   tag on every card — so the eye connects "I picked React" to "this is the React on
+   tag on every card, so the eye connects "I picked React" to "this is the React on
    this project", and there is one place to change the colour. */
 .chip-input:checked + .chip,
 .tech-tag[data-selected='true'] {
@@ -393,10 +393,10 @@ body {
 .lightbox {
   /* Tailwind's preflight zeroes every element's margin, which is what the
      native dialog:modal UA stylesheet relies on to center via `margin:
-     auto` — so centering is pinned explicitly here instead. */
+     auto`, so centering is pinned explicitly here instead. */
   position: fixed;
-  /* The UA stylesheet sets `right: 0`, which — combined with the `left: 50%`
-     below — over-widens the box to fill that gap instead of shrinking to
+  /* The UA stylesheet sets `right: 0`, which (combined with the `left: 50%`
+     below) over-widens the box to fill that gap instead of shrinking to
      the image, leaving a portrait image stranded on the left. Clearing
      every inset first stops that. */
   inset: auto;
@@ -429,7 +429,7 @@ body {
 }
 
 /* The dialog itself is focused on open (see Lightbox.astro) purely to keep
-   the close button from lighting up unprompted — it isn't a control, so it
+   the close button from lighting up unprompted; it isn't a control, so it
    gets no visible ring of its own. */
 .lightbox:focus-visible {
   outline: none;

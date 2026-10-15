@@ -29,10 +29,10 @@ describe('layoutTimeline', () => {
     const layout = layoutTimeline(
       [role('kpmg', '2024-10', '2025-10')],
       [
-        project('after', '2026-05'), // row 1 — after the job
-        project('during-late', '2025-08'), // row 2 — inside
-        project('during-early', '2024-10'), // row 3 — inside, on the start month
-        project('before', '2024-01'), // row 4 — before the job
+        project('after', '2026-05'), // row 1, after the job
+        project('during-late', '2025-08'), // row 2, inside
+        project('during-early', '2024-10'), // row 3, inside, on the start month
+        project('before', '2024-01'), // row 4, before the job
       ],
     );
     const kpmg = layout.roles.find((r) => r.id === 'kpmg')!;

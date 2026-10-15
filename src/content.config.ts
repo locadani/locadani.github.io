@@ -15,7 +15,7 @@ const month = z
 const tech = z
   .array(z.enum(TECH_SLUGS))
   .nonempty('list at least one technology')
-  .describe('slugs from src/data/tech.ts — an unknown slug fails the build');
+  .describe('slugs from src/data/tech.ts; an unknown slug fails the build');
 
 /** `end` absent means ongoing. */
 const endNotBeforeStart = (v: { start: string; end?: string }) =>

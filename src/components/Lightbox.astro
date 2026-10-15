@@ -1,11 +1,11 @@
 ---
 /**
  * One shared <dialog> for every project's thumbnails. Triggers keep their
- * real `href` to the full image, so without JS a click still opens it —
+ * real `href` to the full image, so without JS a click still opens it;
  * this script only intercepts the click to show it in place instead.
  *
  * Prev/next paging is scoped to the clicked trigger's `[data-lightbox-group]`
- * ancestor (one per project — see Timeline.astro), so paging never crosses
+ * ancestor (one per project, see Timeline.astro), so paging never crosses
  * from one project's images into another's.
  */
 ---
@@ -38,7 +38,7 @@
 
   if (dialog && img && closeBtn && prevBtn && nextBtn && captionEl && indexEl) {
     // The full set of images in the currently-open group, and where we are
-    // within it — both re-derived from the DOM each time a trigger opens
+    // within it, both re-derived from the DOM each time a trigger opens
     // the dialog, so they always match what's actually on the page.
     let items: HTMLAnchorElement[] = [];
     let current = 0;

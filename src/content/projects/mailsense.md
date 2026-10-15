@@ -17,5 +17,5 @@ images:
 A master database routes each request to the correct tenant database, with per-tenant mail
 connections and object storage buckets. Mail is ingested by a dedicated processor over different sources (IMAP/SMTP, Microsoft Graph API or Gmail API).
 
-The platform runs as several services — an API, an email processor, the Python AI agent,
+The platform runs as several services: an API, an email processor, the Python AI agent,
 and shared libraries. Local development runs the whole stack, mail server included, in Docker.

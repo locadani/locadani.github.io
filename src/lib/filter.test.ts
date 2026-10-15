@@ -20,7 +20,7 @@ const ENTRIES: Filterable[] = [
 
 describe('matches', () => {
   it('matches everything when nothing is selected', () => {
-    // An empty filter is "no filter" — not "no results".
+    // An empty filter is "no filter", not "no results".
     for (const e of ENTRIES) {
       expect(matches(e, new Set())).toBe(true);
     }
@@ -35,7 +35,7 @@ describe('matches', () => {
   });
 
   it('uses OR across selections, not AND', () => {
-    // A recruiter picking two stacks wants either, not the intersection —
+    // A recruiter picking two stacks wants either, not the intersection:
     // AND would return empty for most pairs and read as a broken filter.
     const selected = new Set(['react', 'kotlin']);
     expect(ENTRIES.filter((e) => matches(e, selected)).map((e) => e.id)).toEqual([

@@ -7,8 +7,8 @@
  * the content and splintering the filter into near-duplicate chips that each
  * match a different subset of the work.
  *
- * Technologies only. Topics and domains — computer vision, GPU computing,
- * multi-tenancy — belong in an entry's prose, not here: a chip reading
+ * Technologies only. Topics and domains (computer vision, GPU computing,
+ * multi-tenancy) belong in an entry's prose, not here: a chip reading
  * "computer vision" would filter on subject matter rather than on skill.
  */
 
@@ -110,4 +110,4 @@ export function techName(slug: TechSlug): string {
 
 // `category` is carried on every entry but not yet rendered. It is the hook for
 // grouping the filter chips by kind (languages, frameworks, data, …) if the flat
-// list proves too long — see the note in the README.
+// list proves too long; see the note in the README.
