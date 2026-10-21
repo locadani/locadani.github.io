@@ -57,6 +57,18 @@ body {
 .prose-tight p + p {
   margin-top: 0.6rem;
 }
+/* Same underline as the project titles, so links read as links. */
+.prose-tight a {
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rule);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 150ms;
+}
+.prose-tight a:hover {
+  text-decoration-color: var(--color-accent);
+}
 
 /* ---------------------------------------------------------------------------
    Two-column timeline.
