@@ -5,6 +5,14 @@ start: 2026-10
 repo: https://github.com/locadani/whichride
 summary: Shows which carsharing car in Berlin is cheapest for one trip, among the cars actually parked nearby. An Android app takes a shared Google Maps link and works out the distance and time; a web page takes kilometres and minutes.
 tech: [rust, kotlin, android, axum, astro, svelte, webassembly, typescript, postgresql, docker, google-cloud, terraform, github-actions]
+imageCaptions: false
+images:
+  - src: ./whichride-trip.png
+    alt: The website on a phone, with a trip of 7.4 km and 22 minutes typed in and a card asking which cars are near you.
+  - src: ./whichride-cars.png
+    alt: The car sheet listing every MILES, Bolt Drive and SIXT share car with its price for the trip, three of them ticked.
+  - src: ./whichride-result.png
+    alt: The result, with Bolt Drive's VW Polo the cheapest of the ticked cars at €5.64, and a note that one car not added would be cheaper.
 ---
 
 One Rust core holds every pricing rule: per-minute and per-kilometre rates, packages,
