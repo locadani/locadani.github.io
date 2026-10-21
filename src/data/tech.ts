@@ -56,6 +56,8 @@ export const TECH = {
   'tanstack-query': { name: 'TanStack Query', category: 'framework' },
   axum: { name: 'Axum', category: 'framework' },
   htmx: { name: 'htmx', category: 'framework' },
+  svelte: { name: 'Svelte', category: 'framework' },
+  webassembly: { name: 'WebAssembly', category: 'framework' },
 
   // Data stores
   postgresql: { name: 'PostgreSQL', category: 'data' },

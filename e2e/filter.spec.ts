@@ -22,9 +22,9 @@ const showAll = (page: import('@playwright/test').Page) =>
 
 test('renders every project with the filter idle', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator(entries)).toHaveCount(17);
+  await expect(page.locator(entries)).toHaveCount(18);
   await expect(page.locator(timeline)).toHaveAttribute('data-filtering', 'false');
-  await expect(page.locator('[data-filter-count]')).toContainText('17 projects');
+  await expect(page.locator('[data-filter-count]')).toContainText('18 projects');
 });
 
 test('reveals the filter once scripting is available', async ({ page }) => {
@@ -45,8 +45,8 @@ test('on a wide screen, selecting a technology collapses non-matching entries', 
   const matched = page.locator('[data-entry][data-match="true"]');
   const count = await matched.count();
   expect(count).toBeGreaterThan(0);
-  expect(count).toBeLessThan(17);
-  await expect(page.locator('[data-filter-count]')).toHaveText(`${count} of 17 projects use React`);
+  expect(count).toBeLessThan(18);
+  await expect(page.locator('[data-filter-count]')).toHaveText(`${count} of 18 projects use React`);
 
   // A non-matching entry keeps its heading but collapses its body to nothing.
   const missBody = page.locator('[data-entry][data-match="false"]').first().locator('.entry-body');
@@ -111,8 +111,8 @@ test('the two columns collapse to one chronological column on a phone', async ({
   expect(reading.slice(0, 4)).toEqual([
     'Backwell Tech Corp',
     'Smoke tracker',
+    'whichride',
     'Customer Intelligence',
-    'MailSense',
   ]);
 
   expect(
@@ -157,7 +157,7 @@ test('Clear restores the full timeline and drops the URL parameter', async ({ pa
   await page.goto('/?tech=react');
   await page.getByRole('button', { name: 'Clear' }).click();
   await expect(page.locator(timeline)).toHaveAttribute('data-filtering', 'false');
-  await expect(page.locator('[data-entry][data-match="true"]')).toHaveCount(17);
+  await expect(page.locator('[data-entry][data-match="true"]')).toHaveCount(18);
   await expect(page).not.toHaveURL(/tech=/);
 });
 
@@ -295,18 +295,18 @@ test('a selected technology is highlighted on the cards that matched it', async 
 test('collapsed, the filter shows only technologies used more than once', async ({ page }) => {
   await page.goto('/');
   await expect(chip(page, 'react')).toBeVisible();
-  await expect(chip(page, 'kotlin')).toBeHidden();
+  await expect(chip(page, 'vhdl')).toBeHidden();
 
   await showAll(page);
-  await expect(chip(page, 'kotlin')).toBeVisible();
+  await expect(chip(page, 'vhdl')).toBeVisible();
   await page.getByRole('button', { name: 'Show fewer' }).click();
-  await expect(chip(page, 'kotlin')).toBeHidden();
+  await expect(chip(page, 'vhdl')).toBeHidden();
 });
 
 test('a selected chip stays visible while the list is collapsed', async ({ page }) => {
   // A shared link can select a rarely used technology; its chip must not vanish.
-  await page.goto('/?tech=kotlin');
-  await expect(chip(page, 'kotlin')).toBeVisible();
+  await page.goto('/?tech=vhdl');
+  await expect(chip(page, 'vhdl')).toBeVisible();
 });
 
 test('the results bar says what a click did and sticks while scrolling', async ({ page }) => {
@@ -316,7 +316,7 @@ test('the results bar says what a click did and sticks while scrolling', async (
   await chip(page, 'python').click();
 
   const bar = page.locator('[data-filter-bar]');
-  await expect(bar.locator('[data-filter-count]')).toHaveText(/^\d+ of 17 projects use Python or React$/);
+  await expect(bar.locator('[data-filter-count]')).toHaveText(/^\d+ of 18 projects use Python or React$/);
 
   await page.mouse.wheel(0, 2000);
   await expect.poll(async () => (await bar.boundingBox())?.y).toBe(0);
