@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 660" width="1080" height="660" role="img" aria-label="Diagram of the whichride architecture: the Android app, the website and the server all call one Rust pricing core, through UniFFI, WebAssembly and as a Rust crate; the server on Google Cloud Run holds the catalogue and crowd prices in Postgres and proxies routing to OpenRouteService without storing any location.">
+  <title>whichride architecture</title>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52555c"/>
+    </marker>
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d5ab0"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1080" height="660" fill="#fdfcfa"/>
+
+  <!-- header -->
+  <text x="540" y="46" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="600" fill="#1a1d23">whichride: Architecture</text>
+
+  <!-- ============ Android box ============ -->
+  <rect x="40" y="130" width="240" height="130" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="160" y="190" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Android app</text>
+  <text x="160" y="212" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">Kotlin &#183; Jetpack Compose</text>
+
+  <!-- ============ Website box ============ -->
+  <rect x="40" y="300" width="240" height="130" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="160" y="360" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Website</text>
+  <text x="160" y="382" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">Astro</text>
+
+  <!-- ============ Rust core box (accent) ============ -->
+  <rect x="400" y="200" width="240" height="160" rx="10" fill="#e5f1ff" stroke="#1d5ab0" stroke-width="1.5"/>
+  <text x="520" y="276" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1d5ab0">Shared core</text>
+  <text x="520" y="298" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1d5ab0">Rust &#183; all the app&#39;s rules</text>
+
+  <!-- ============ Server box ============ -->
+  <rect x="780" y="130" width="260" height="300" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="910" y="165" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Server</text>
+  <text x="910" y="185" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">Axum &#183; Google Cloud Run</text>
+
+  <line x1="800" y1="202" x2="1020" y2="202" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="800" y="228" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Catalogue</text>
+  <text x="800" y="245" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">cars and their prices</text>
+
+  <line x1="800" y1="262" x2="1020" y2="262" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="800" y="288" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Crowd prices</text>
+  <text x="800" y="305" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">reports, votes, confirmations</text>
+
+  <line x1="800" y1="322" x2="1020" y2="322" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="800" y="348" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Route proxy</text>
+  <text x="800" y="365" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">routing, geocoding, Maps links</text>
+
+  <line x1="800" y1="382" x2="1020" y2="382" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="910" y="401" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#86898f">price reports checked by</text>
+  <text x="910" y="416" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#86898f">Google Play Integrity</text>
+
+  <!-- ============ Postgres box ============ -->
+  <rect x="820" y="530" width="220" height="90" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="930" y="562" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Postgres</text>
+  <text x="930" y="584" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">Neon</text>
+  <text x="930" y="600" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">prices, reports, votes</text>
+
+  <!-- ============ OpenRouteService box ============ -->
+  <rect x="400" y="530" width="240" height="90" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="520" y="568" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">OpenRouteService</text>
+  <text x="520" y="590" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">distance and time for the trip</text>
+
+  <!-- ============ Arrows ============ -->
+
+  <!-- Clients and server -> core (accent) -->
+  <line x1="284" y1="230" x2="396" y2="230" stroke="#1d5ab0" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrowAccent)"/>
+  <text x="340" y="207" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">compiled in via</text>
+  <text x="340" y="221" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">UniFFI</text>
+
+  <line x1="284" y1="330" x2="396" y2="330" stroke="#1d5ab0" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrowAccent)"/>
+  <text x="340" y="307" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">compiled in via</text>
+  <text x="340" y="321" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">WebAssembly</text>
+
+  <line x1="776" y1="280" x2="644" y2="280" stroke="#1d5ab0" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrowAccent)"/>
+  <text x="710" y="270" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">compiled in</text>
+
+  <!-- Android <-> Server -->
+  <line x1="284" y1="150" x2="776" y2="150" stroke="#52555c" stroke-width="1.6" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="530" y="140" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">prices &#183; price reports and votes &#183; routes &#183; place search &#183; Maps links</text>
+
+  <!-- Server -> Website -->
+  <line x1="776" y1="410" x2="284" y2="410" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="530" y="400" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">serves the pages and the catalogue</text>
+
+  <!-- Server -> Postgres -->
+  <line x1="930" y1="430" x2="930" y2="526" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="944" y="482" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">stores</text>
+
+  <!-- Server -> OpenRouteService -->
+  <polyline points="800,430 800,575 644,575" fill="none" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="722" y="548" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">coordinates pass</text>
+  <text x="722" y="563" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">through, never stored</text>
+
+</svg>

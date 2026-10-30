@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 610" width="1080" height="610" role="img" aria-label="Diagram of the Smoke tracker delivery pipeline: every pull request must pass build, test, front-end, security and infrastructure checks before it can merge; a merge to main builds one Docker image, scans it with Trivy, signs in to Google Cloud without a stored key and deploys the image to Google Cloud Run, while Terraform owns every other setting and is applied by hand after its plan is reviewed. Security scans and dependency updates also run on a schedule, with a nightly database backup.">
+  <title>Smoke Tracker: Delivery Pipeline</title>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52555c"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1080" height="610" fill="#fdfcfa"/>
+
+  <text x="540" y="46" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="600" fill="#1a1d23">Smoke Tracker: Delivery Pipeline</text>
+
+  <rect x="40" y="100" width="300" height="340" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="190" y="135" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Pull request</text>
+  <text x="190" y="155" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">every check must pass to merge</text>
+  <line x1="60" y1="172" x2="320" y2="172" stroke="#ebedf0" stroke-width="1"/>
+  <text x="60" y="198" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Build and test</text>
+  <text x="60" y="215" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">fmt &#183; clippy &#183; tests on SQLite and Postgres</text>
+  <line x1="60" y1="234" x2="320" y2="234" stroke="#ebedf0" stroke-width="1"/>
+  <text x="60" y="260" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Front end</text>
+  <text x="60" y="277" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">Biome &#183; axe accessibility, light and dark</text>
+  <line x1="60" y1="296" x2="320" y2="296" stroke="#ebedf0" stroke-width="1"/>
+  <text x="60" y="322" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Security</text>
+  <text x="60" y="339" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">cargo-deny &#183; gitleaks &#183; Trivy &#183; CodeQL</text>
+  <line x1="60" y1="358" x2="320" y2="358" stroke="#ebedf0" stroke-width="1"/>
+  <text x="60" y="384" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Infrastructure</text>
+  <text x="60" y="401" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">Terraform checks, plan posted on the PR</text>
+  <rect x="400" y="100" width="300" height="340" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="550" y="135" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Merge to main</text>
+  <text x="550" y="155" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">deploy workflow</text>
+  <line x1="420" y1="172" x2="680" y2="172" stroke="#ebedf0" stroke-width="1"/>
+  <text x="420" y="198" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Build</text>
+  <text x="420" y="215" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">one Docker image, one static binary</text>
+  <line x1="420" y1="234" x2="680" y2="234" stroke="#ebedf0" stroke-width="1"/>
+  <text x="420" y="260" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Scan</text>
+  <text x="420" y="277" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">Trivy, stops on high or critical</text>
+  <line x1="420" y1="296" x2="680" y2="296" stroke="#ebedf0" stroke-width="1"/>
+  <text x="420" y="322" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Deploy</text>
+  <text x="420" y="339" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">Artifact Registry, then Cloud Run</text>
+  <rect x="410" y="364" width="280" height="46" rx="8" fill="#e5f1ff" stroke="#1d5ab0" stroke-width="1.2"/>
+  <text x="550" y="383" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">keyless sign-in:</text>
+  <text x="550" y="399" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" font-weight="600" fill="#1d5ab0">no cloud key stored in GitHub</text>
+  <rect x="780" y="100" width="260" height="150" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="910" y="173" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Google Cloud Run</text>
+  <text x="910" y="195" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">each deploy only swaps the app version</text>
+  <rect x="780" y="290" width="260" height="150" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="910" y="355" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Terraform</text>
+  <text x="910" y="377" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">plan reviewed on the pull request</text>
+  <text x="910" y="393" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">applied by hand in Cloud Shell</text>
+  <line x1="344" y1="270" x2="396" y2="270" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="370" y="260" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">merge</text>
+  <line x1="704" y1="175" x2="776" y2="175" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="740" y="165" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">new image</text>
+  <line x1="910" y1="290" x2="910" y2="254" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="924" y="276" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">every other setting</text>
+  <rect x="40" y="490" width="1000" height="80" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="540" y="528" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">On a schedule</text>
+  <text x="540" y="550" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">weekly security scans &#183; Dependabot updates &#183; nightly database backup</text>
+
+</svg>

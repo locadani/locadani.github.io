@@ -7,6 +7,10 @@ summary: An installable web app for logging cigarette smoke drifting into our ap
 tech: [rust, axum, htmx, postgresql, sqlite, docker, google-cloud, terraform, github-actions]
 imageCaptions: false
 images:
+  - src: ./smoke-tracker-architecture.svg
+    alt: Diagram of the Smoke tracker architecture, showing the phone sending forms to a server on Google Cloud Run, where the web layer calls a domain layer with no I/O that reads and writes SQLite locally or Postgres in production.
+  - src: ./smoke-tracker-pipeline.svg
+    alt: Diagram of the Smoke tracker delivery pipeline, showing every pull request passing build, test, front-end, security and infrastructure checks before it can merge, then each merge to main building one Docker image, scanning it with Trivy, signing in to Google Cloud without a stored key and deploying to Google Cloud Run, with Terraform owning every other setting and applied by hand after review.
   - src: ./smoke-tracker-log.png
     alt: The Log screen on a phone, with a smell event in progress banner and this month's counts of events, reports, bedroom days and clean checks.
   - src: ./smoke-tracker-log-level.png

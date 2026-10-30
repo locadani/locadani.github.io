@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 500" width="1080" height="500" role="img" aria-label="Diagram of the Smoke tracker architecture: the phone sends forms to a server on Google Cloud Run, where the web layer calls a domain layer with no I/O, which reads and writes SQLite locally or Postgres in production.">
+  <title>Smoke tracker architecture</title>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52555c"/>
+    </marker>
+    <marker id="arrowAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d5ab0"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1080" height="500" fill="#fdfcfa"/>
+
+  <!-- header -->
+  <text x="540" y="46" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="600" fill="#1a1d23">Smoke Tracker: Architecture</text>
+
+  <!-- ============ Phone box ============ -->
+  <rect x="40" y="150" width="220" height="270" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="150" y="185" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Phone</text>
+  <text x="150" y="205" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">installable PWA</text>
+
+  <line x1="60" y1="222" x2="240" y2="222" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="60" y="250" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Log a report</text>
+  <text x="60" y="267" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">rooms, level 0&#8211;10, PM2.5</text>
+
+  <line x1="60" y1="284" x2="240" y2="284" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="60" y="312" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Graphs</text>
+  <text x="60" y="329" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">filters kept in the address</text>
+
+  <line x1="60" y1="346" x2="240" y2="346" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="60" y="374" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Invite</text>
+  <text x="60" y="391" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">one-time QR &#183; guests expire</text>
+
+  <!-- ============ Binary boundary ============ -->
+  <rect x="340" y="100" width="380" height="350" rx="10" fill="none" stroke="#dee0e4" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="530" y="124" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="10" letter-spacing="0.05em" fill="#86898f">GOOGLE CLOUD RUN</text>
+
+  <!-- smoke-web -->
+  <rect x="380" y="150" width="300" height="110" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="530" y="187" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Web layer</text>
+  <text x="530" y="209" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">Axum routes &#183; Askama &#183; htmx &#183; Fluent</text>
+
+  <!-- smoke-domain -->
+  <rect x="380" y="300" width="300" height="130" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="530" y="337" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Domain</text>
+  <text x="530" y="359" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">pure Rust, no I/O</text>
+  <text x="530" y="375" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">permissions &#183; event rules</text>
+
+  <!-- ============ Storage box ============ -->
+  <rect x="800" y="150" width="240" height="230" rx="10" fill="#f8f6f3" stroke="#dee0e4" stroke-width="1.5"/>
+  <text x="920" y="185" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1a1d23">Storage</text>
+  <text x="920" y="205" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#86898f">two backends, one contract</text>
+
+  <line x1="820" y1="222" x2="1020" y2="222" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="820" y="250" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">SQLite</text>
+  <text x="820" y="267" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">local runs and tests</text>
+
+  <line x1="820" y1="284" x2="1020" y2="284" stroke="#ebedf0" stroke-width="1"/>
+
+  <text x="820" y="312" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1a1d23">Postgres</text>
+  <text x="820" y="329" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">Neon &#183; production</text>
+
+  <!-- ============ Arrows ============ -->
+
+  <!-- Phone -> Web layer: forms -->
+  <line x1="264" y1="190" x2="376" y2="190" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="320" y="180" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">forms</text>
+
+  <!-- Web layer -> Phone: pages -->
+  <line x1="376" y1="225" x2="264" y2="225" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="320" y="245" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">HTML pages</text>
+
+  <!-- Web -> Domain -->
+  <line x1="530" y1="260" x2="530" y2="296" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="544" y="283" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11.5" fill="#52555c">use cases</text>
+
+  <!-- Domain -> Storage -->
+  <line x1="684" y1="365" x2="796" y2="365" stroke="#52555c" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+
+
+</svg>

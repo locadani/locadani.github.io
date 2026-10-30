@@ -8,6 +8,8 @@ tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, 
 images:
   - src: ./mailsense-architecture.svg
     alt: Diagram of the MailSense email pipeline, showing the email processor reading and sending mail via Outlook, Gmail, or generic IMAP/SMTP, storing data in per-tenant storage, and pushing each tenant's context to a single shared AI agent that classifies email and drafts replies using that pushed context instead of its own database.
+  - src: ./mailsense-pipeline.svg
+    alt: Diagram of the MailSense delivery pipeline, showing the development, staging and production branches each mapped to its own environment, every push running GitHub Actions checks for the .NET services, Docker images, database migrations and frontend, and Railway deploying each service only after every check passes. Locally the whole stack runs in Docker Compose, with a mail server and object storage.
   - src: ./mailsense-workflow-list.png
     alt: The MailSense workflow list, showing several orders at different stages of the Request, Quote, Order, Production, and Ready pipeline, filterable by status.
   - src: ./mailsense-ai-conversation.png

@@ -8,6 +8,8 @@ tech: [nextjs, react, typescript, supabase, postgresql, tailwind, stripe, openai
 images:
   - src: ./customer-intelligence-architecture.svg
     alt: Diagram of Customer Intelligence's per-tenant pipeline, from CSV import through geocoding, churn/CLV scoring, and personalization, handing off to a separate, standalone letter service that submits PDFs to Pingen and reports delivery status back over a webhook.
+  - src: ./customer-intelligence-pipeline.svg
+    alt: Diagram of the Customer Intelligence delivery pipeline, showing main deploying to Production by pull request and staging to Staging, with staging reset to match main after every merge, GitHub Actions checks for the app and the letter service, and Railway deploying only after every check passes. A weekly job cleans up old CI runs and artifacts.
   - src: ./customer-intelligence-map.png
     alt: The customer map, showing prospects and customers clustered geographically
   - src: ./customer-intelligence-dashboard.png
