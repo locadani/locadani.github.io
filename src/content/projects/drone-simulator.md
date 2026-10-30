@@ -1,6 +1,7 @@
 ---
 title: Drone simulator
-context: personal
+context: academic
+org: Politecnico di Milano
 start: 2022-10
 end: 2023-01
 repo: https://github.com/locadani/drone_simulator

@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import { chipsFor, groupChips } from '../lib/filter';
-import { layoutTimeline, roleCovers } from '../lib/timeline';
+import { layoutTimeline } from '../lib/timeline';
 import { formatRange, formatMonth } from '../lib/format';
 import { techName } from '../data/tech';
 
@@ -25,27 +25,6 @@ const chipGroups = groupChips(
 const projectCount = projectEntries.length;
 const chipCount = chipGroups.reduce((n, group) => n + group.chips.length, 0);
 
-/**
- * Which organisation a project sits under. Filtering hides the role bars, so a
- * surviving card has to carry its own context, otherwise "what was I doing when
- * I built this" is lost exactly when the reader has narrowed down to it.
- *
- * A project with its own `org` uses it. Otherwise, if a role was held at that
- * date, the card says so, which is how a personal project shows that it was
- * built alongside a job.
- */
-function contextFor(entry: (typeof projectEntries)[number]): string | undefined {
-  if (entry.data.org) return entry.data.org;
-  const covering = roleEntries.filter((r) =>
-    roleCovers({ id: r.id, start: r.data.start, end: r.data.end }, entry.data.start),
-  );
-  // Prefer an actual job over the degree, which spans years and would otherwise win.
-  const role = covering.find((r) => r.data.kind === 'role') ?? covering[0];
-  return role ? `while at ${role.data.org}` : undefined;
-}
-
-/** Work and personal lead; research and university fill out the early years. */
-const LEADING = new Set(['work', 'personal']);
 const CONTEXT_LABEL = {
   work: 'Work',
   personal: 'Personal',
@@ -192,9 +171,6 @@ const items = [
   </div>
 
   <div class="tl mt-6" data-timeline data-filtering="false">
-    <!-- The axis line, one element spanning every row. -->
-    <span class="tl-spine" aria-hidden="true"></span>
-
     {
       items.map((item) => {
         if (item.kind === 'year') {
@@ -265,7 +241,6 @@ const items = [
         }
 
         const { entry, row, Content } = item;
-        const leading = LEADING.has(entry.data.context);
         return (
           <div
             class="tl-project"
@@ -274,16 +249,6 @@ const items = [
             data-match="true"
             data-tech={entry.data.tech.join(' ')}
           >
-            <span
-              class:list={[
-                'entry-dot tl-dot',
-                leading
-                  ? 'border-(--color-ink-soft) bg-(--color-ink-soft)'
-                  : 'border-(--color-rule) bg-(--color-paper)',
-              ]}
-              aria-hidden="true"
-            />
-
             {/* Thumbnails sit beside the title where there is room, and drop below
                 it on a phone; beside it they would squeeze the title to a sliver. */}
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
@@ -308,10 +273,13 @@ const items = [
                     : formatMonth(entry.data.start)}
                   <span class="mx-1.5 opacity-50">·</span>
                   {CONTEXT_LABEL[entry.data.context]}
-                  {contextFor(entry) && (
+                  {/* Only the employer or university the project was done for. Which
+                      job a personal project ran alongside is already plain from
+                      the roles column. */}
+                  {entry.data.org && (
                     <>
                       <span class="mx-1.5 opacity-50">·</span>
-                      {contextFor(entry)}
+                      {entry.data.org}
                     </>
                   )}
                 </p>

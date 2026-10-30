@@ -86,10 +86,6 @@ body {
   gap: 0;
 }
 
-.tl-spine {
-  display: none;
-}
-
 .tl-year {
   margin-top: 2rem;
   padding-bottom: 0.25rem;
@@ -106,20 +102,7 @@ body {
 }
 
 .tl-project {
-  position: relative;
-  padding-left: 1.25rem;
   padding-block: 0.75rem;
-}
-
-.tl-dot {
-  position: absolute;
-  top: 1.05rem;
-  left: 0;
-  display: block;
-  height: 0.5rem;
-  width: 0.5rem;
-  border-radius: 9999px;
-  border-width: 1px;
 }
 
 @media (min-width: 768px) {
@@ -129,17 +112,6 @@ body {
     grid-template-columns: minmax(0, 1.7fr) 3.5rem minmax(0, 1fr);
     column-gap: 0;
     align-items: start;
-  }
-
-  /* One element, every row: the continuous axis the two columns hang off. */
-  .tl-spine {
-    display: block;
-    grid-column: 2;
-    grid-row: 1 / -1;
-    justify-self: center;
-    width: 1px;
-    height: 100%;
-    background: var(--color-rule);
   }
 
   .tl-year {
@@ -198,12 +170,6 @@ body {
     bottom: 0;
   }
 
-  /* Education spans years but is not a job, so a quieter rail. */
-  .tl-role[data-kind='education'] .tl-rail {
-    background: var(--color-rule);
-    width: 1px;
-  }
-
   .tl-role-card {
     /* Sticks while its own span scrolls past, so the job stays visible next to
        every project that belongs to it. */
@@ -218,14 +184,6 @@ body {
     grid-row: var(--row);
     padding: 0.5rem 1.75rem 1.5rem 0;
   }
-
-  /* The dot sits on the inner edge, touching the axis, so each project is
-     visibly pinned to its point in time. */
-  .tl-dot {
-    top: 0.9rem;
-    left: auto;
-    right: -0.25rem;
-  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -235,10 +193,10 @@ body {
    entry; everything below is CSS. The behaviour deliberately differs by width:
 
    - Wide screens dim and collapse non-matching entries to thin stubs. There is
-     room for the spine, and keeping the rows means the role bars still align
+     room for them, and keeping the rows means the role bars still align
      with the projects beside them.
    - Phones remove them outright. A stub still costs a scroll, which is exactly
-     what filtering is meant to save, so the role bars, spine and year markers
+     what filtering is meant to save, so the role bars and year markers
      go too, and each surviving card carries its own "Work · Backwell Tech Corp"
      context instead.
    --------------------------------------------------------------------------- */
@@ -268,17 +226,10 @@ body {
   font-weight: 400;
 }
 
-[data-filtering='true'] [data-match='true'] .entry-dot {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  transform: scale(1.15);
-}
-
 /* Phones: a results list, not a dimmed timeline. */
 @media (max-width: 767px) {
   [data-filtering='true'] [data-match='false'],
   [data-filtering='true'] .tl-role,
-  [data-filtering='true'] .tl-spine,
   [data-filtering='true'] .tl-year {
     display: none;
   }
@@ -291,20 +242,12 @@ body {
   }
 }
 
-.entry-dot {
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease,
-    transform 200ms ease;
-}
-
 /* "De-emphasised" must never mean unreadable, and motion is opt-out. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .entry-body,
-  .entry-dot,
   .chip,
   .tech-tag {
     transition: none;

@@ -177,7 +177,7 @@ test('on a phone, filtering removes non-matching entries instead of dimming them
     await expect(misses.nth(i)).toBeHidden();
   }
 
-  // Role bars, spine and year markers go with them: with rows removed they would
+  // Role bars and year markers go with them: with rows removed they would
   // no longer line up with anything.
   await expect(page.locator('.tl-role').first()).toBeHidden();
   await expect(page.locator('.tl-year').first()).toBeHidden();
@@ -185,7 +185,7 @@ test('on a phone, filtering removes non-matching entries instead of dimming them
   await expect(page.locator('[data-entry][data-match="true"]').first()).toBeVisible();
 });
 
-test('a phone card names the job it was built under, since the role bars are gone', async ({
+test('a card names the organisation it was built for, and nothing for a personal project', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
@@ -195,13 +195,13 @@ test('a phone card names the job it was built under, since the role bars are gon
   const first = page.locator('[data-entry][data-match="true"]').first();
   await expect(first).toContainText('Backwell Tech Corp');
 
-  // A personal project states the job it was built alongside rather than an employer.
+  // The roles column already shows which job a personal project ran alongside.
   await page.getByRole('button', { name: 'Clear' }).click();
   await showAll(page);
   await chip(page, 'spring-boot').click();
   const anki = page.locator('[data-entry][data-match="true"]').first();
   await expect(anki).toContainText('Personal');
-  await expect(anki).toContainText('while at KPMG Italy');
+  await expect(anki).not.toContainText('KPMG');
 });
 
 test('filtering a phone leaves nothing to scroll past', async ({ page }) => {
