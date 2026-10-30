@@ -16,6 +16,10 @@ const entries = '[data-entry]';
 const chip = (page: import('@playwright/test').Page, slug: string) =>
   page.locator(`label[for="tech-${slug}"]`);
 
+/** Below md the chips are folded behind a "Filter by technology" button. */
+const openFilter = (page: import('@playwright/test').Page) =>
+  page.getByRole('button', { name: /^Filter by technology/ }).click();
+
 /** Technologies used only once are tucked behind "Show all" until it is pressed. */
 const showAll = (page: import('@playwright/test').Page) =>
   page.getByRole('button', { name: /^Show all \d+ technologies$/ }).click();
@@ -91,7 +95,7 @@ test('every role bar spans the rows of the projects done during it', async ({ pa
   const kpmg = page.locator('.tl-role', { hasText: 'KPMG Italy' });
   const bar = (await kpmg.boundingBox())!;
 
-  for (const title of ['Anki uploader', 'Proficiency assessment', 'Cashflow visualization']) {
+  for (const title of ['Anki uploader', 'Proficiency assessment platform', 'Cashflow visualization']) {
     const project = page.locator('[data-entry]', { hasText: title }).first();
     const box = (await project.boundingBox())!;
     const centre = box.y + box.height / 2;
@@ -174,6 +178,7 @@ test('on a phone, filtering removes non-matching entries instead of dimming them
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   await chip(page, 'react').click();
 
   // A dimmed stub still costs a scroll, which is the thing being complained about.
@@ -196,6 +201,7 @@ test('a card names the organisation it was built for, and nothing for a personal
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   await chip(page, 'react').click();
 
   const first = page.locator('[data-entry][data-match="true"]').first();
@@ -213,6 +219,7 @@ test('a card names the organisation it was built for, and nothing for a personal
 test('filtering a phone leaves nothing to scroll past', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   const unfiltered = await page.evaluate(() => document.body.scrollHeight);
 
   await chip(page, 'react').click();
@@ -228,6 +235,7 @@ test('on a phone each filter category label sits on its own row above its chips'
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   await showAll(page);
 
   const label = page.locator('#tech-filter p', { hasText: 'Languages' }).first();
@@ -245,6 +253,7 @@ test('a filtered phone hides the hints that describe the unfiltered timeline', a
 }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   const hints = page.locator('.tl-hint');
   await expect(hints.first()).toBeVisible();
 
@@ -318,6 +327,7 @@ test('a selected chip stays visible while the list is collapsed', async ({ page 
 test('the results bar says what a click did and sticks while scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
+  await openFilter(page);
   await chip(page, 'react').click();
   await chip(page, 'python').click();
 
@@ -347,4 +357,27 @@ test('on a phone, card thumbnails sit below the title instead of squeezing it', 
   const title = (await card.locator('h3').boundingBox())!;
   const thumbs = (await card.locator('[data-lightbox-group]').boundingBox())!;
   expect(thumbs.y).toBeGreaterThanOrEqual(title.y + title.height);
+});
+
+test('on a small screen the filter is folded until its button is pressed', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto('/');
+  const button = page.getByRole('button', { name: /^Filter by technology/ });
+  await expect(button).toHaveAttribute('aria-expanded', 'false');
+  await expect(chip(page, 'react')).toBeHidden();
+
+  await button.click();
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  await chip(page, 'react').click();
+  await expect(button).toHaveAccessibleName('Filter by technology (1)');
+
+  await button.click();
+  await expect(chip(page, 'react')).toBeHidden();
+});
+
+test('on a wide screen the filter is always open and has no fold button', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('[data-filter-open]')).toBeHidden();
+  await expect(chip(page, 'react')).toBeVisible();
 });

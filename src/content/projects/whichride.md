@@ -4,7 +4,7 @@ context: personal
 start: 2026-10
 repo: https://github.com/locadani/whichride
 summary: Shows which carsharing car in Berlin is cheapest for one trip, among the cars actually parked nearby. The Android app takes a shared Google Maps link and works out the distance and time; on the web page users enter the kilometres and minutes by hand.
-tech: [rust, kotlin, android, axum, astro, svelte, webassembly, typescript, postgresql, docker, google-cloud, terraform, github-actions]
+tech: [rust, kotlin, android, axum, astro, svelte, webassembly, typescript, postgresql, docker, google-cloud, terraform, github-actions, claude-code]
 imageCaptions: false
 images:
   - src: ./whichride-architecture.svg

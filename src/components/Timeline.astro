@@ -76,7 +76,7 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
     id="timeline-heading"
     class="font-mono text-sm font-semibold tracking-[0.18em] text-(--color-ink) uppercase"
   >
-    Projects &amp; career
+    Projects &amp; roles
   </h2>
   {/* Phones only: from md up the sticky column headers say it instead. The
       caption has to be true in every state, and once a phone is filtered there
@@ -90,16 +90,32 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
        nothing; the script reveals it. -->
   <form id="tech-filter" class="no-print mt-8 hidden" data-filter-form data-expanded="false">
     <fieldset>
-      <legend class="text-sm text-(--color-ink-soft)">
+      <legend class="text-sm text-(--color-ink-soft) max-md:sr-only">
         Filter by technology <span class="text-(--color-ink-faint)"
           >(projects using any of them)</span
         >
       </legend>
 
+      {/* Below md the chips fold away behind this button, so the filter is one
+          line until asked for; from md up there is room and it is always open. */}
+      <button
+        type="button"
+        class="filter-open flex w-full items-center justify-between rounded-md border border-(--color-rule) px-3 py-2 text-sm text-(--color-ink-soft) md:hidden"
+        aria-controls="tech-filter-body"
+        aria-expanded="false"
+        data-filter-open
+      >
+        <span>Filter by technology <span class="text-(--color-accent)" data-filter-open-count></span></span>
+        <svg class="filter-open-chevron size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" />
+        </svg>
+      </button>
+
       <!-- Collapsed, the groups dissolve into one flat row of the technologies used
            more than once (see .chip-groups in global.css); expanded, each category
            gets its own row. On a phone a category label sits on its own line above
            its chips; side by side from md up. -->
+      <div id="tech-filter-body" class="filter-body">
       <div id="tech-chips" class="chip-groups mt-4 space-y-2.5">
         {
           chipGroups.map((group) => (
@@ -153,6 +169,7 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
         data-label-more={`Show all ${chipCount} technologies`}
         data-label-less="Show fewer">Show all {chipCount} technologies</button
       >
+      </div>
     </fieldset>
   </form>
 
@@ -257,7 +274,7 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
             {/* Thumbnails sit beside the title where there is room, and drop below
                 it on a phone; beside it they would squeeze the title to a sliver. */}
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
-              <div class="min-w-0 flex-1">
+              <div class="min-w-0 flex-1 sm:max-w-[60%] sm:flex-none">
                 <h3 class="entry-title leading-snug font-semibold">
                   {entry.data.repo ? (
                     <a
@@ -290,9 +307,14 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
                 </p>
               </div>
 
+              {/* Beside the title the strip fills whatever room the title leaves, so it
+                  never crowds it; any images past that scroll, and the arrows
+                  (shown by the script below) say there is more. */}
               {entry.data.images && entry.data.images.length > 0 && (
+                <div class="thumb-strip relative -mr-6 flex min-w-0 sm:mr-0 sm:flex-1 sm:justify-end" data-thumb-strip>
                 <div
-                  class="-mr-6 flex shrink-0 flex-row gap-1.5 overflow-x-auto pr-6 sm:mr-0 sm:overflow-visible sm:pr-0"
+                  class="thumb-scroller flex min-w-0 flex-row gap-1.5 overflow-x-auto pr-6 sm:pr-0"
+                  data-thumb-scroller
                   data-lightbox-group={entry.id}
                 >
                   {entry.data.images.map((img) => (
@@ -313,10 +335,35 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
                         width={160}
                         height={112}
                         loading={entry.id === eagerImagesId ? 'eager' : 'lazy'}
-                        class="h-14 w-20 rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
+                        class="h-14 w-20 max-w-none rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
                       />
                     </a>
                   ))}
+                </div>
+                {/* Mouse-only shortcuts: keyboard users tab through the thumbnails,
+                    which scroll themselves into view. */}
+                <button
+                  type="button"
+                  class="thumb-arrow thumb-arrow-start"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  data-thumb-arrow="-1"
+                >
+                  <svg class="size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 4l-4 4 4 4" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="thumb-arrow thumb-arrow-end"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  data-thumb-arrow="1"
+                >
+                  <svg class="size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 4l4 4-4 4" />
+                  </svg>
+                </button>
                 </div>
               )}
             </div>
@@ -351,3 +398,34 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
     {projectCount} projects · roles shown as bars spanning their dates
   </p>
 </section>
+
+<script>
+  // Each thumbnail strip shows an arrow on whichever side has images scrolled
+  // out of view; clicking it pages the strip that way.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  for (const strip of document.querySelectorAll<HTMLElement>('[data-thumb-strip]')) {
+    const scroller = strip.querySelector<HTMLElement>('[data-thumb-scroller]');
+    if (!scroller) continue;
+
+    const update = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      // A pixel of slack: zoomed pages leave fractional scroll offsets.
+      strip.dataset.moreStart = String(scroller.scrollLeft > 1);
+      strip.dataset.moreEnd = String(scroller.scrollLeft < max - 1);
+    };
+
+    for (const arrow of strip.querySelectorAll<HTMLButtonElement>('[data-thumb-arrow]')) {
+      arrow.addEventListener('click', () => {
+        scroller.scrollBy({
+          left: Number(arrow.dataset.thumbArrow) * scroller.clientWidth * 0.8,
+          behavior: reduceMotion.matches ? 'auto' : 'smooth',
+        });
+      });
+    }
+
+    scroller.addEventListener('scroll', update, { passive: true });
+    new ResizeObserver(update).observe(scroller);
+    update();
+  }
+</script>

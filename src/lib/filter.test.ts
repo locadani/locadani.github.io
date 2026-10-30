@@ -143,7 +143,7 @@ describe('groupChips', () => {
     expect(groupChips(chips).map((g) => g.label)).toEqual([
       'Languages',
       'Frameworks',
-      'Data',
+      'Storage',
       'Infrastructure',
       'AI',
       'Tooling',

@@ -4,7 +4,7 @@ context: work
 org: Backwell Tech Corp
 start: 2025-11
 summary: A modular platform shell that composes several business-intelligence products (production intelligence, customer intelligence, mergers and acquisitions, reporting and a design studio) behind one authenticated, multi-language front end.
-tech: [nextjs, react, typescript, supabase, postgresql, threejs, rag, openai, mistral, aws-s3, tailwind, playwright, k6]
+tech: [nextjs, react, typescript, supabase, postgresql, threejs, rag, openai, mistral, aws-s3, tailwind, playwright, k6, claude-code]
 ---
 
 The most interesting piece is a product agent: an interactive 3D machine model paired with

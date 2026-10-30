@@ -23,6 +23,8 @@
   const pillsEl = document.querySelector<HTMLElement>('[data-filter-pills]');
   const resetEl = document.querySelector<HTMLElement>('[data-filter-reset]');
   const toggleEl = document.querySelector<HTMLButtonElement>('[data-filter-toggle]');
+  const openEl = document.querySelector<HTMLButtonElement>('[data-filter-open]');
+  const openCountEl = document.querySelector<HTMLElement>('[data-filter-open-count]');
 
   if (form && timeline) {
     const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="tech"]')];
@@ -88,6 +90,7 @@
         );
       }
       renderPills(selected);
+      if (openCountEl) openCountEl.textContent = active ? `(${selected.size})` : '';
       resetEl?.classList.toggle('hidden', !active);
 
       if (pushUrl) {
@@ -129,6 +132,12 @@
       toggleEl.setAttribute('aria-expanded', String(expanded));
       toggleEl.textContent =
         (expanded ? toggleEl.dataset.labelLess : toggleEl.dataset.labelMore) ?? '';
+    });
+
+    openEl?.addEventListener('click', () => {
+      const open = form.dataset.open !== 'true';
+      form.dataset.open = String(open);
+      openEl.setAttribute('aria-expanded', String(open));
     });
 
     // Restore a shared link's filter state: ?tech=react,python

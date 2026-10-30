@@ -162,6 +162,7 @@ body {
     width: 2px;
     border-radius: 1px;
     background: var(--color-ink-faint);
+    opacity: 0.5;
   }
 
   .tl-rail::before,
@@ -267,6 +268,7 @@ body {
   .site-header[data-visible='true'],
   .entry-body,
   .chip,
+  .filter-open-chevron,
   .tech-tag {
     transition: none;
   }
@@ -314,6 +316,56 @@ body {
 [data-expanded='false'] .chip-group-label,
 [data-expanded='false'] .chip-item[data-minor]:not(:has(:checked)) {
   display: none;
+}
+
+/* A project's thumbnail strip. It scrolls sideways when the images outrun the
+   room beside the title; the scrollbar is hidden, and an arrow over a fade
+   marks each side with more to see (data-more-* set by Timeline's script). */
+.thumb-scroller {
+  scrollbar-width: none;
+}
+.thumb-scroller::-webkit-scrollbar {
+  display: none;
+}
+.thumb-arrow {
+  position: absolute;
+  inset-block: 0;
+  display: none;
+  align-items: center;
+  width: 2rem;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+.thumb-arrow:hover {
+  color: var(--color-accent);
+}
+.thumb-arrow-start {
+  left: 0;
+  justify-content: flex-start;
+  background: linear-gradient(to right, var(--color-paper) 40%, transparent);
+}
+.thumb-arrow-end {
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to left, var(--color-paper) 40%, transparent);
+}
+[data-thumb-strip][data-more-start='true'] .thumb-arrow-start,
+[data-thumb-strip][data-more-end='true'] .thumb-arrow-end {
+  display: flex;
+}
+
+/* Small screens: the chips stay folded behind the "Filter by technology"
+   button until it is pressed. From md up the button is hidden and they show. */
+@media (max-width: 767px) {
+  [data-filter-form]:not([data-open='true']) .filter-body {
+    display: none;
+  }
+}
+.filter-open-chevron {
+  transition: rotate 150ms ease;
+}
+[data-filter-form][data-open='true'] .filter-open-chevron {
+  rotate: 180deg;
 }
 
 /* The results bar. Idle it is a quiet line under the chips; once filtering it

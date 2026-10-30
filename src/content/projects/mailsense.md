@@ -4,7 +4,7 @@ context: work
 org: Backwell Tech Corp
 start: 2025-12
 summary: An email automation platform where an AI agent reads incoming mail and drafts replies, with per-tenant feature flags controlling which capabilities each customer has.
-tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, gmail-api, python]
+tech: [csharp, dotnet, aspnet-core, postgresql, docker, minio, microsoft-graph, gmail-api, python, claude-code]
 images:
   - src: ./mailsense-architecture.svg
     alt: Diagram of the MailSense email pipeline, showing the email processor reading and sending mail via Outlook, Gmail, or generic IMAP/SMTP, storing data in per-tenant storage, and pushing each tenant's context to a single shared AI agent that classifies email and drafts replies using that pushed context instead of its own database.

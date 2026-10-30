@@ -96,6 +96,7 @@ export const TECH = {
   k6: { name: 'k6', category: 'tooling' },
   gradle: { name: 'Gradle', category: 'tooling' },
   figma: { name: 'Figma', category: 'tooling' },
+  'claude-code': { name: 'Claude Code', category: 'tooling' },
 } as const satisfies Record<string, TechMeta>;
 
 export type TechSlug = keyof typeof TECH;

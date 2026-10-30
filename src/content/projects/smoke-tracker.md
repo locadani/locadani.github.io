@@ -4,7 +4,7 @@ context: personal
 start: 2026-10
 repo: https://github.com/locadani/smoke-tracker
 summary: An installable web app for logging cigarette smoke drifting into our apartment from neighbours. Months of reports build a detailed, tamper-evident record that can be relied on as evidence.
-tech: [rust, axum, htmx, postgresql, sqlite, docker, google-cloud, terraform, github-actions]
+tech: [rust, axum, htmx, postgresql, sqlite, docker, google-cloud, terraform, github-actions, claude-code]
 imageCaptions: false
 images:
   - src: ./smoke-tracker-architecture.svg

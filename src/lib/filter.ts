@@ -110,7 +110,7 @@ export function describeMatch(matched: number, total: number, names: readonly st
 const CATEGORY_ORDER: readonly { category: TechCategory; label: string }[] = [
   { category: 'language', label: 'Languages' },
   { category: 'framework', label: 'Frameworks' },
-  { category: 'data', label: 'Data' },
+  { category: 'data', label: 'Storage' },
   { category: 'infra', label: 'Infrastructure' },
   { category: 'ai', label: 'AI' },
   { category: 'tooling', label: 'Tooling' },
