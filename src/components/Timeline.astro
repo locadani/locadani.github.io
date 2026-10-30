@@ -19,9 +19,11 @@ const layout = layoutTimeline(
 const rowOfProject = new Map(layout.projects.map((p) => [p.id, p.row]));
 const spanOfRole = new Map(layout.roles.map((r) => [r.id, r]));
 
-const chipGroups = groupChips(
-  chipsFor(projectEntries.map((p) => ({ id: p.id, tech: p.data.tech }))),
-);
+const chips = chipsFor(projectEntries.map((p) => ({ id: p.id, tech: p.data.tech })));
+const chipGroups = groupChips(chips);
+// Collapsed, the groups dissolve into one row; this rank keeps that row in
+// overall usage order rather than category order (see .chip-item in global.css).
+const rankOf = new Map(chips.map((chip, i) => [chip.slug, i]));
 const projectCount = projectEntries.length;
 const chipCount = chipGroups.reduce((n, group) => n + group.chips.length, 0);
 
@@ -57,30 +59,26 @@ const projects = await Promise.all(
  * the two columns tell on a wide screen.
  */
 const items = [
-  ...layout.yearMarkers.map((marker) => ({ kind: 'year' as const, ...marker })),
   ...roles.map((role) => ({ ...role, row: role.span.rowStart })),
   ...projects,
 ].sort((a, b) => {
-  const priority = { year: 0, role: 1, project: 2 } as const;
+  const priority = { role: 0, project: 1 } as const;
   return a.row - b.row || priority[a.kind] - priority[b.kind];
 });
 ---
 
-<section id="timeline" class="mx-auto max-w-6xl px-6 py-14" aria-labelledby="timeline-heading">
+<section id="timeline" class="mx-auto max-w-6xl px-6 pt-6 pb-14" aria-labelledby="timeline-heading">
   <h2
     id="timeline-heading"
-    class="font-mono text-xs tracking-[0.18em] text-(--color-ink-faint) uppercase"
+    class="font-mono text-sm font-semibold tracking-[0.18em] text-(--color-ink) uppercase"
   >
     Projects &amp; career
   </h2>
-  {/* The caption has to be true in every state: there are no columns on a phone,
-      and no role bars at all once a phone is filtered, hence tl-hint. */}
-  <p class="tl-hint mt-2 max-w-2xl text-sm text-(--color-ink-faint)">
-    <span class="md:hidden">Each role, followed by what I built during it.</span>
-    <span class="hidden md:inline"
-      >What I built on the left, the role I held on the right, aligned so you can
-      see what I did when.</span
-    >
+  {/* Phones only: from md up the sticky column headers say it instead. The
+      caption has to be true in every state, and once a phone is filtered there
+      are no roles on screen, hence tl-hint. */}
+  <p class="tl-hint mt-2 max-w-2xl text-sm text-(--color-ink-faint) md:hidden">
+    Each role, followed by what I built during it.
   </p>
 
   <!-- Real checkboxes in a real fieldset: keyboard and screen-reader support
@@ -107,7 +105,11 @@ const items = [
               </p>
               <div class="chip-row mt-1.5 flex flex-wrap gap-1.5 md:mt-0">
               {group.chips.map((chip) => (
-                <div class="chip-item" data-minor={chip.count < 2 ? '' : undefined}>
+                <div
+                  class="chip-item"
+                  data-minor={chip.count < 2 ? '' : undefined}
+                  style={`--rank: ${rankOf.get(chip.slug)}`}
+                >
                   <input
                     type="checkbox"
                     id={`tech-${chip.slug}`}
@@ -150,11 +152,12 @@ const items = [
     </fieldset>
   </form>
 
-  <!-- The answer to "what did that click do?". It sits directly under the chips
-       and, while a filter is on, sticks to the top of the screen, so the result
-       count and the way back out stay in view however far the reader scrolls. -->
+  <!-- The answer to "what did that click do?". Visually hidden while idle; while
+       a filter is on it sits under the chips and sticks to the top of the screen,
+       so the result count and the way back out stay in view however far the
+       reader scrolls. -->
   <div
-    class="filter-bar no-print hidden mt-5 -mx-6 px-6 py-2.5 md:-mx-3 md:px-3"
+    class="filter-bar no-print hidden mt-4 -mx-6 px-6 py-2.5 md:-mx-3 md:px-3"
     data-filter-bar
     data-active="false"
   >
@@ -170,20 +173,18 @@ const items = [
     </div>
   </div>
 
-  <div class="tl mt-6" data-timeline data-filtering="false">
+  <!-- Column headers, on the same grid as the timeline below. They stick while
+       the timeline scrolls, so the reader never loses which side is which. -->
+  <div
+    class="tl-heads font-mono text-xs font-semibold tracking-[0.18em] text-(--color-ink-soft) uppercase"
+  >
+    <p>Projects</p>
+    <p>Roles</p>
+  </div>
+
+  <div class="tl mt-6 md:mt-0 md:pt-2.5" data-timeline data-filtering="false">
     {
       items.map((item) => {
-        if (item.kind === 'year') {
-          return (
-            <p
-              class="tl-year font-mono text-[0.6875rem] text-(--color-ink-faint)"
-              style={`--row: ${item.row}`}
-            >
-              {item.year}
-            </p>
-          );
-        }
-
         if (item.kind === 'role') {
           const { entry, span, Content } = item;
           return (

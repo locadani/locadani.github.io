@@ -1,0 +1,39 @@
+---
+import { site } from '../data/site';
+
+const link =
+  'underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:text-(--color-accent) hover:decoration-(--color-accent)';
+---
+
+{/* Hidden at the top of the page, where the hero already shows the name and
+    links, and slid in once the hero's name scrolls out of view. Its height is
+    --header-h in global.css, which everything else that sticks (the filter bar,
+    the role cards) offsets itself by. */}
+<header class="site-header" data-site-header>
+  <nav
+    class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 text-sm"
+    aria-label="Main"
+  >
+    <a href="/" class={`font-serif text-base whitespace-nowrap min-[375px]:text-xl sm:text-2xl font-medium text-(--color-ink) ${link}`}>
+      {site.name}
+    </a>
+    <div class="flex items-center gap-4 text-(--color-ink-soft) sm:gap-5">
+      <a href="#timeline" class={`hidden sm:inline ${link}`}>Projects</a>
+      <a href={site.links.github} class={link} rel="me noopener">GitHub</a>
+      <a href={site.links.linkedin} class={link} rel="me noopener">LinkedIn</a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const name = document.querySelector('main h1');
+
+  if (header && name) {
+    // Shown only once the name has gone off the top, not while it is still
+    // below the fold of a short screen.
+    new IntersectionObserver(([entry]) => {
+      header.dataset.visible = String(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+    }).observe(name);
+  }
+</script>

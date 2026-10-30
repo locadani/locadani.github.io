@@ -44,7 +44,6 @@ export interface PlacedRole {
 export interface TimelineLayout {
   readonly projects: readonly PlacedProject[];
   readonly roles: readonly PlacedRole[];
-  readonly yearMarkers: readonly { year: string; row: number }[];
   readonly rowCount: number;
 }
 
@@ -113,20 +112,9 @@ export function layoutTimeline(
       return { id: role.id, rowStart: first, rowEnd: last + 1 };
     });
 
-  const yearMarkers: { year: string; row: number }[] = [];
-  let previous: string | null = null;
-  slots.forEach((slot, index) => {
-    const year = slot.date.slice(0, 4);
-    if (year !== previous) {
-      yearMarkers.push({ year, row: index + 1 });
-      previous = year;
-    }
-  });
-
   return {
     projects: placedProjects,
     roles: placedRoles,
-    yearMarkers,
     rowCount: slots.length,
   };
 }

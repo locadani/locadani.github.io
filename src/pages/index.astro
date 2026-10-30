@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import Hero from '../components/Hero.astro';
 import Timeline from '../components/Timeline.astro';
 import FilterScript from '../components/FilterScript.astro';
@@ -8,9 +9,9 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Base>
+  <SiteHeader />
   <main>
     <Hero />
-    <div class="mx-auto max-w-6xl px-6"><hr class="border-(--color-rule)" /></div>
     <Timeline />
   </main>
   <Footer />

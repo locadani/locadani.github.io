@@ -17,8 +17,15 @@
   --color-accent-soft: oklch(95.5% 0.028 258);
 }
 
+/* Height of the sticky site header; anything else that sticks sits below it. */
+:root {
+  --header-h: 3.75rem;
+}
+
 html {
   scroll-behavior: smooth;
+  /* Anchor jumps (#timeline) land below the header, not under it. */
+  scroll-padding-top: var(--header-h);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -39,6 +46,31 @@ body {
 
 ::selection {
   background: var(--color-accent-soft);
+}
+
+.site-header {
+  /* Fixed rather than sticky, so it takes no room at the top of the page while
+     hidden. Hidden means off-screen and `visibility: hidden`, so its links are
+     out of the tab order too; the visibility flips only after the slide out. */
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 30;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+  transform: translateY(-100%);
+  visibility: hidden;
+  transition:
+    transform 200ms ease,
+    visibility 0s linear 200ms;
+}
+.site-header[data-visible='true'] {
+  transform: none;
+  visibility: visible;
+  transition: transform 200ms ease;
+}
+.site-header nav {
+  height: calc(var(--header-h) - 1px);
 }
 
 
@@ -75,8 +107,8 @@ body {
 
    Mobile is a plain single column following DOM order, which the component sorts
    into "job, then what I built during it". At 768px the shared grid switches on:
-   roles occupy column 1 and span every row their dates cover, the year axis is
-   column 2, projects are column 3. Row numbers come from lib/timeline.ts as
+   projects occupy column 1, and roles column 2, each spanning every row its
+   dates cover. Row numbers come from lib/timeline.ts as
    custom properties, so the placement rules live in one tested place.
    --------------------------------------------------------------------------- */
 
@@ -84,13 +116,6 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
-}
-
-.tl-year {
-  margin-top: 2rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid var(--color-rule-soft);
-  letter-spacing: 0.12em;
 }
 
 .tl-role {
@@ -109,25 +134,13 @@ body {
   .tl {
     /* Projects lead and get the wider column; they are the point of the page.
        Roles are supporting context, so they take the narrower one. */
-    grid-template-columns: minmax(0, 1.7fr) 3.5rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     column-gap: 0;
     align-items: start;
   }
 
-  .tl-year {
-    grid-column: 2;
-    grid-row: var(--row);
-    z-index: 1;
-    margin-top: 0;
-    padding: 0.35rem 0;
-    justify-self: center;
-    border-bottom: 0;
-    background: var(--color-paper);
-    text-align: center;
-  }
-
   .tl-role {
-    grid-column: 3;
+    grid-column: 2;
     /* The bar spans its whole duration; that span is the point of the layout. */
     grid-row: var(--row-start) / var(--row-end);
     position: relative;
@@ -174,7 +187,9 @@ body {
     /* Sticks while its own span scrolls past, so the job stays visible next to
        every project that belongs to it. */
     position: sticky;
-    top: 1.5rem;
+    /* Below the site header and the sticky column headers (2.3125rem), with
+       the same 1.125rem gap the card keeps from its rail. */
+    top: calc(var(--header-h) + 2.3125rem + 1.125rem);
     align-self: flex-start;
     width: 100%;
   }
@@ -182,7 +197,9 @@ body {
   .tl-project {
     grid-column: 1;
     grid-row: var(--row);
-    padding: 0.5rem 1.75rem 1.5rem 0;
+    /* With the rail 0.75rem into the role column, this leaves the same 1.125rem
+       on both sides of it: projects to rail, rail to role card. */
+    padding: 0.5rem 0.375rem 1.5rem 0;
   }
 }
 
@@ -196,7 +213,7 @@ body {
      room for them, and keeping the rows means the role bars still align
      with the projects beside them.
    - Phones remove them outright. A stub still costs a scroll, which is exactly
-     what filtering is meant to save, so the role bars and year markers
+     what filtering is meant to save, so the role bars
      go too, and each surviving card carries its own "Work · Backwell Tech Corp"
      context instead.
    --------------------------------------------------------------------------- */
@@ -229,8 +246,7 @@ body {
 /* Phones: a results list, not a dimmed timeline. */
 @media (max-width: 767px) {
   [data-filtering='true'] [data-match='false'],
-  [data-filtering='true'] .tl-role,
-  [data-filtering='true'] .tl-year {
+  [data-filtering='true'] .tl-role {
     display: none;
   }
 
@@ -247,6 +263,8 @@ body {
   html {
     scroll-behavior: auto;
   }
+  .site-header,
+  .site-header[data-visible='true'],
   .entry-body,
   .chip,
   .tech-tag {
@@ -289,6 +307,10 @@ body {
 [data-expanded='false'] .chip-row {
   display: contents;
 }
+/* Flattened, order by usage then name across all groups, not group by group. */
+[data-expanded='false'] .chip-item {
+  order: var(--rank);
+}
 [data-expanded='false'] .chip-group-label,
 [data-expanded='false'] .chip-item[data-minor]:not(:has(:checked)) {
   display: none;
@@ -301,9 +323,22 @@ body {
   background: var(--color-paper);
   border-bottom: 1px solid transparent;
 }
+/* Idle, "18 projects" says nothing the page doesn't, so it goes. Visually
+   hidden rather than display: none, so the aria-live count still announces the
+   first click. */
+.filter-bar[data-active='false'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .filter-bar[data-active='true'] {
   position: sticky;
-  top: 0;
+  top: var(--header-h);
   z-index: 20;
   border-bottom-color: var(--color-rule);
 }
@@ -328,10 +363,33 @@ body {
   opacity: 1;
 }
 
+/* Phones have no columns, so nothing to label. */
+.tl-heads {
+  display: none;
+}
+
 @media (min-width: 768px) {
+  .tl-heads {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    position: sticky;
+    top: var(--header-h);
+    z-index: 15;
+    margin-top: 1.5rem;
+    padding-block: 0.625rem;
+    border-bottom: 1px solid var(--color-rule);
+    background: var(--color-paper);
+  }
+  .tl-heads > :last-child {
+    padding-left: 2rem;
+  }
+
   /* Clear the sticky results bar, which now occupies the top of the screen. */
+  section:has(.tl[data-filtering='true']) .tl-heads {
+    top: calc(var(--header-h) + 2.75rem);
+  }
   .tl[data-filtering='true'] .tl-role-card {
-    top: 4.5rem;
+    top: calc(var(--header-h) + 2.75rem + 2.3125rem + 1.125rem);
   }
 }
 
@@ -525,10 +583,12 @@ body {
   .no-print {
     display: none !important;
   }
+  .site-header {
+    display: none;
+  }
   /* Print the whole timeline, never a filtered subset. */
   [data-filtering='true'] [data-match='false'],
-  [data-filtering='true'] .tl-role,
-  [data-filtering='true'] .tl-year {
+  [data-filtering='true'] .tl-role {
     display: revert;
     opacity: 1;
   }

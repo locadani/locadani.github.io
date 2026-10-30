@@ -27,6 +27,13 @@ test('renders every project with the filter idle', async ({ page }) => {
   await expect(page.locator('[data-filter-count]')).toContainText('18 projects');
 });
 
+test('idle, the results line is not shown; a filtered link shows it', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-filter-bar]')).not.toBeInViewport();
+  await page.goto('/?tech=react');
+  await expect(page.locator('[data-filter-bar]')).toBeVisible();
+});
+
 test('reveals the filter once scripting is available', async ({ page }) => {
   await page.goto('/');
   // It ships hidden, because without JS it would do nothing.
@@ -177,10 +184,9 @@ test('on a phone, filtering removes non-matching entries instead of dimming them
     await expect(misses.nth(i)).toBeHidden();
   }
 
-  // Role bars and year markers go with them: with rows removed they would
-  // no longer line up with anything.
+  // Role bars go with them: with rows removed they would no longer line up
+  // with anything.
   await expect(page.locator('.tl-role').first()).toBeHidden();
-  await expect(page.locator('.tl-year').first()).toBeHidden();
 
   await expect(page.locator('[data-entry][data-match="true"]').first()).toBeVisible();
 });
@@ -255,7 +261,7 @@ test('a wide screen keeps its hints while filtering, because the bars are still 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   await chip(page, 'react').click();
-  await expect(page.locator('.tl-hint').first()).toBeVisible();
+  await expect(page.locator('.tl-hint').last()).toBeVisible();
 });
 
 
@@ -318,8 +324,10 @@ test('the results bar says what a click did and sticks while scrolling', async (
   const bar = page.locator('[data-filter-bar]');
   await expect(bar.locator('[data-filter-count]')).toHaveText(/^\d+ of 18 projects use Python or React$/);
 
+  // It sticks directly under the sticky site header, not behind it.
+  const header = (await page.locator('.site-header').boundingBox())!;
   await page.mouse.wheel(0, 2000);
-  await expect.poll(async () => (await bar.boundingBox())?.y).toBe(0);
+  await expect.poll(async () => (await bar.boundingBox())?.y).toBe(header.height);
 });
 
 test('removing a pill in the results bar unticks its chip', async ({ page }) => {

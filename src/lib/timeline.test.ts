@@ -94,23 +94,9 @@ describe('layoutTimeline', () => {
     expect(layout.rowCount).toBe(3);
   });
 
-  it('marks the first row of each year, once', () => {
-    const layout = layoutTimeline([], [
-      project('a', '2026-05'),
-      project('b', '2025-12'),
-      project('c', '2025-01'),
-      project('d', '2024-06'),
-    ]);
-    expect(layout.yearMarkers).toEqual([
-      { year: '2026', row: 1 },
-      { year: '2025', row: 2 },
-      { year: '2024', row: 4 },
-    ]);
-  });
-
   it('handles no content at all', () => {
     const layout = layoutTimeline([], []);
-    expect(layout).toMatchObject({ projects: [], roles: [], yearMarkers: [], rowCount: 0 });
+    expect(layout).toMatchObject({ projects: [], roles: [], rowCount: 0 });
   });
 
   it('is deterministic regardless of input order', () => {
