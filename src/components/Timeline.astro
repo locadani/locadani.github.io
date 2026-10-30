@@ -65,6 +65,10 @@ const items = [
   const priority = { role: 0, project: 1 } as const;
   return a.row - b.row || priority[a.kind] - priority[b.kind];
 });
+
+// The topmost project's thumbnails sit above the fold on a desktop screen, so
+// they load eagerly; every other image stays lazy.
+const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry.data.images?.length)?.entry.id;
 ---
 
 <section id="timeline" class="mx-auto max-w-6xl px-6 pt-6 pb-14" aria-labelledby="timeline-heading">
@@ -308,6 +312,7 @@ const items = [
                         alt={img.alt}
                         width={160}
                         height={112}
+                        loading={entry.id === eagerImagesId ? 'eager' : 'lazy'}
                         class="h-14 w-20 rounded border border-(--color-rule) bg-(--color-paper-sunk) object-cover"
                       />
                     </a>
