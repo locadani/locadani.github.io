@@ -12,6 +12,7 @@ export const site = {
     { name: 'Italian', level: 'Native' },
     { name: 'English', level: 'C1' },
     { name: 'German', level: 'B1' },
+    { name: 'Turkish', level: 'A2' },
   ],
   links: {
     github: 'https://github.com/locadani',
