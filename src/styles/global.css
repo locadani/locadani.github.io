@@ -20,6 +20,95 @@
 /* Height of the sticky site header; anything else that sticks sits below it. */
 :root {
   --header-h: 3.75rem;
+
+  /* One colour per role, assigned newest first and cycled (see Timeline.astro).
+     Same lightness and chroma, so no job looks louder than another. */
+  --color-role-1: oklch(54% 0.1 175);
+  --color-role-2: oklch(52% 0.12 295);
+  --color-role-3: oklch(56% 0.13 32);
+  --color-role-4: oklch(60% 0.1 80);
+
+  /* How strongly a role card is tinted with its colour (0% = plain paper).
+     The card's border uses a little more, so its edge still shows. */
+  --role-tint: 20%;
+}
+
+/* A role card is tinted with its role's colour, the same colour as its rail,
+   so card and rail read as one object. Opaque on purpose: the card is sticky
+   and projects scroll past behind it. Mixed in oklab, not oklch: oklch would
+   blend the hue too, and the warm paper would drag teal toward olive. */
+.tl-role-card {
+  background: color-mix(in oklab, var(--role) var(--role-tint), var(--color-paper));
+  border-color: color-mix(in oklab, var(--role) calc(var(--role-tint) + 15%), var(--color-paper));
+  /* The faint grey is too light on the tint; darken it within the card only. */
+  --color-ink-faint: oklch(47% 0.012 265);
+}
+
+/* The technology recap under a role's bullets: one labelled row per kind. */
+.role-tech {
+  margin-top: 0.625rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+.role-tech-row {
+  display: contents;
+}
+.role-tech dt {
+  padding-top: 0.0625rem;
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.role-tech dd {
+  margin: 0;
+  min-width: 0;
+}
+.role-tech ul {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+}
+/* The dot trails its item and never wraps away from it, so a wrapped line
+   never starts with a stray separator. */
+.role-tech li {
+  white-space: nowrap;
+}
+.role-tech li:not(:last-child)::after {
+  content: '·';
+  margin-left: 0.5rem;
+  opacity: 0.5;
+}
+/* Folded: each row is cut to its first line (1.5em is one line at this
+   line-height). Whatever wraps is clipped, and the script counts it for the
+   button and drops the separator after the last name left on the line. */
+.role-tech[data-folded='true'] ul {
+  max-height: 1.5em;
+  overflow: hidden;
+}
+.role-tech[data-folded='true'] li[data-line-end]::after {
+  content: none;
+}
+/* With the button showing below, the body needs less padding of its own. */
+.tl-role-card:has(.tl-role-foot:not(.hidden)) .tl-role-body {
+  padding-bottom: 0.5rem;
+}
+.role-tech-more {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--color-accent) 35%, transparent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.role-tech-more:hover {
+  text-decoration-color: currentColor;
 }
 
 html {
@@ -132,20 +221,23 @@ body {
 
 @media (min-width: 768px) {
   .tl {
-    /* Projects lead and get the wider column; they are the point of the page.
-       Roles are supporting context, so they take the narrower one. */
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    /* Roles on the left, as a coloured spine; projects take the wider column
+       on the right, since they are the point of the page. Left is also the
+       reading order: the job first, then what was built during it, which is
+       the order a phone shows them in too. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
     column-gap: 0;
     align-items: start;
   }
 
   .tl-role {
-    grid-column: 2;
+    grid-column: 1;
     /* The bar spans its whole duration; that span is the point of the layout. */
     grid-row: var(--row-start) / var(--row-end);
     position: relative;
     margin: 0;
-    padding: 0.5rem 0 1.5rem 2rem;
+    /* The rail runs down the side facing the projects. */
+    padding: 0.5rem 2rem 1.5rem 0;
     align-self: stretch;
     display: flex;
   }
@@ -157,12 +249,14 @@ body {
     display: block;
     position: absolute;
     top: 0.75rem;
-    left: 0.75rem;
+    right: 0.75rem;
     bottom: 0.75rem;
     width: 2px;
     border-radius: 1px;
-    background: var(--color-ink-faint);
-    opacity: 0.5;
+    /* The role's own colour, matching its tinted card, softened so the line
+       doesn't outweigh the card. */
+    background: var(--role);
+    opacity: 0.6;
   }
 
   .tl-rail::before,
@@ -190,17 +284,37 @@ body {
     position: sticky;
     /* Below the site header and the sticky column headers (2.3125rem), with
        the same 1.125rem gap the card keeps from its rail. */
-    top: calc(var(--header-h) + 2.3125rem + 1.125rem);
+    --card-top: calc(var(--header-h) + 2.3125rem + 1.125rem);
+    top: var(--card-top);
     align-self: flex-start;
     width: 100%;
+    /* Never taller than the screen below the header and the column labels,
+       with the same gap at the bottom, or an unfolded card would run off the
+       bottom while stuck. The head stays; the body scrolls. */
+    max-height: calc(100dvh - var(--card-top) - 1.125rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .tl-role-head {
+    flex-shrink: 0;
+  }
+
+  .tl-role-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--role) 50%, transparent) transparent;
   }
 
   .tl-project {
-    grid-column: 1;
+    grid-column: 2;
     grid-row: var(--row);
     /* With the rail 0.75rem into the role column, this leaves the same 1.125rem
-       on both sides of it: projects to rail, rail to role card. */
-    padding: 0.5rem 0.375rem 1.5rem 0;
+       on both sides of it: role card to rail, rail to projects. */
+    padding: 0.5rem 0 1.5rem 0.375rem;
   }
 }
 
@@ -423,7 +537,7 @@ body {
 @media (min-width: 768px) {
   .tl-heads {
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
     position: sticky;
     top: var(--header-h);
     z-index: 15;
@@ -432,8 +546,9 @@ body {
     border-bottom: 1px solid var(--color-rule);
     background: var(--color-paper);
   }
+  /* Lines up with the project text, which starts just past the rail. */
   .tl-heads > :last-child {
-    padding-left: 2rem;
+    padding-left: 0.375rem;
   }
 
   /* Clear the sticky results bar, which now occupies the top of the screen. */
@@ -501,11 +616,19 @@ body {
 }
 
 /* Prev/next sit either side of the card, on the backdrop, so they never
-   cover any of the screenshot. */
+   cover any of the screenshot. The gap is wider than the close button pokes
+   out past the card's corner, so the ✕ and the arrows can never overlap. */
 .lightbox-stage {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+}
+
+/* Anchors the close button to the card's top-right corner. */
+.lightbox-frame {
+  position: relative;
+  display: flex;
+  min-width: 0;
 }
 
 .lightbox-panel {
@@ -519,17 +642,42 @@ body {
   overflow: hidden;
 }
 
-/* Leaves room for the two nav buttons and their gaps (2 × 1.75rem + 2 ×
-   0.5rem) beside the card, and for the close row and caption. */
-.lightbox img {
+.lightbox-viewport {
   display: block;
-  max-width: calc(min(96vw, 64rem) - 4.5rem);
-  max-height: calc(92vh - 7rem);
+  cursor: zoom-in;
 }
 
-/* No caption: only the close row and the "1 / 4" counter to leave room for. */
+/* Zoomed: the viewport keeps the size the image was shown at (set inline by
+   the script) and the enlarged image scrolls inside it. */
+.lightbox-viewport.is-zoomed {
+  overflow: auto;
+  overscroll-behavior: contain;
+  cursor: grab;
+  scrollbar-width: thin;
+}
+.lightbox-viewport.is-dragging {
+  cursor: grabbing;
+}
+.lightbox-viewport.is-zoomed img {
+  max-width: none;
+  max-height: none;
+  height: auto;
+  cursor: inherit;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Leaves room for the two nav buttons and their gaps (2 × 1.75rem + 2 ×
+   0.75rem) beside the card, and for the caption and counter below it. */
+.lightbox img {
+  display: block;
+  max-width: calc(min(96vw, 64rem) - 5rem);
+  max-height: calc(92vh - 5.5rem);
+}
+
+/* No caption: only the "1 / 4" counter to leave room for. */
 .lightbox:has(.lightbox-caption[hidden]) img {
-  max-height: calc(92vh - 4rem);
+  max-height: calc(92vh - 3rem);
 }
 
 .lightbox-caption {
@@ -546,27 +694,36 @@ body {
   color: var(--color-ink-soft);
 }
 
+/* On the card's corner, half on and half off it. It reaches 0.625rem past
+   the card's edge, less than the 0.75rem gap to the next arrow. */
 .lightbox-close {
-  /* Its own row above the card, right-aligned, out on the backdrop. */
-  align-self: flex-end;
-  margin-bottom: 0.5rem;
+  position: absolute;
+  z-index: 1;
+  top: -0.625rem;
+  right: -0.625rem;
   display: flex;
-  flex-shrink: 0;
   height: 1.5rem;
   width: 1.5rem;
-  font-size: 0.75rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  /* White on the dark backdrop, since they sit outside the card. */
   border: none;
-  background: transparent;
-  color: white;
-  line-height: 1;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 0.3);
 }
 
 .lightbox-close:hover {
-  background: rgb(255 255 255 / 0.15);
+  background: var(--color-accent);
+}
+
+.lightbox-close svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .lightbox-nav {
@@ -581,12 +738,20 @@ body {
   border: none;
   background: transparent;
   color: white;
-  font-size: 1.25rem;
-  line-height: 1;
 }
 
 .lightbox-nav:hover {
   background: rgb(255 255 255 / 0.15);
+}
+
+.lightbox-nav svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .lightbox-index {
@@ -601,8 +766,8 @@ body {
 /* On wide screens the tall phone screenshots are limited by height, not
    width, so a caption underneath would only shrink them. Move it into a
    column beside the image instead: the card gets wider and the image gets
-   the full height of the dialog (less the close row above it). Landscape
-   images keep the caption underneath, where it costs them less. */
+   the full height of the dialog. Landscape images keep the caption
+   underneath, where it costs them less. */
 @media (min-width: 48rem) {
   .lightbox.is-portrait .lightbox-panel {
     display: grid;
@@ -611,9 +776,12 @@ body {
     align-items: start;
   }
 
-  .lightbox.is-portrait img {
+  .lightbox.is-portrait .lightbox-viewport {
     grid-row: 1 / 3;
-    max-width: calc(min(96vw, 64rem) - 4.5rem - 18rem);
+  }
+
+  .lightbox.is-portrait img {
+    max-width: calc(min(96vw, 64rem) - 5rem - 18rem);
     max-height: calc(92vh - 2rem);
   }
 

@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import { chipsFor, groupChips } from '../lib/filter';
 import { layoutTimeline } from '../lib/timeline';
+import { roleTech } from '../lib/roleTech';
 import { formatRange, formatMonth } from '../lib/format';
 import { techName } from '../data/tech';
 
@@ -24,7 +25,6 @@ const chipGroups = groupChips(chips);
 // Collapsed, the groups dissolve into one row; this rank keeps that row in
 // overall usage order rather than category order (see .chip-item in global.css).
 const rankOf = new Map(chips.map((chip, i) => [chip.slug, i]));
-const projectCount = projectEntries.length;
 const chipCount = chipGroups.reduce((n, group) => n + group.chips.length, 0);
 
 const CONTEXT_LABEL = {
@@ -34,12 +34,21 @@ const CONTEXT_LABEL = {
   academic: 'University',
 } as const;
 
+// Each role gets a colour by position, newest first, cycling through the
+// palette in global.css (--color-role-1..4), so a new job needs no choice made.
+const ROLE_PALETTE_SIZE = 4;
+const roleOrder = [...roleEntries]
+  .sort((a, b) => b.data.start.localeCompare(a.data.start) || a.id.localeCompare(b.id))
+  .map((r) => r.id);
+
 const roles = await Promise.all(
   roleEntries.map(async (entry) => ({
     kind: 'role' as const,
     entry,
     span: spanOfRole.get(entry.id)!,
     Content: (await render(entry)).Content,
+    tech: roleTech(entry.data, projectEntries.map((p) => p.data)),
+    colour: `var(--color-role-${(roleOrder.indexOf(entry.id) % ROLE_PALETTE_SIZE) + 1})`,
   })),
 );
 
@@ -76,7 +85,7 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
     id="timeline-heading"
     class="font-mono text-sm font-semibold tracking-[0.18em] text-(--color-ink) uppercase"
   >
-    Projects &amp; roles
+    Roles &amp; projects
   </h2>
   {/* Phones only: from md up the sticky column headers say it instead. The
       caption has to be true in every state, and once a phone is filtered there
@@ -199,33 +208,29 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
   <div
     class="tl-heads font-mono text-xs font-semibold tracking-[0.18em] text-(--color-ink-soft) uppercase"
   >
-    <p>Projects</p>
     <p>Roles</p>
+    <p>Projects</p>
   </div>
 
   <div class="tl mt-6 md:mt-0 md:pt-2.5" data-timeline data-filtering="false">
     {
       items.map((item) => {
         if (item.kind === 'role') {
-          const { entry, span, Content } = item;
+          const { entry, span, Content, tech, colour } = item;
           return (
             <div
               class="tl-role"
-              style={`--row-start: ${span.rowStart}; --row-end: ${span.rowEnd}`}
+              style={`--row-start: ${span.rowStart}; --row-end: ${span.rowEnd}; --role: ${colour}`}
               data-kind={entry.data.kind}
             >
               {/* The rail is the whole point of the layout: its length is the
                   job's real duration, so every project beside it visibly
                   happened during that job. */}
               <span class="tl-rail" aria-hidden="true"></span>
-              <div
-                class:list={[
-                  'tl-role-card rounded-md border px-4 py-3',
-                  entry.data.kind === 'education'
-                    ? 'border-(--color-rule-soft) bg-transparent'
-                    : 'border-(--color-rule) bg-(--color-paper-sunk)',
-                ]}
-              >
+              <div class="tl-role-card rounded-md border">
+                {/* The head stays put; on a wide screen, where the card sticks
+                    and is capped at the screen's height, the body scrolls. */}
+                <div class="tl-role-head px-4 pt-3 pb-2.5">
                 <h3
                   class:list={[
                     'leading-snug',
@@ -240,23 +245,41 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
                   <span class="mx-1 opacity-50">·</span>
                   {entry.data.location}
                 </p>
+                </div>
 
-                <div class="prose-tight mt-2.5 text-[0.875rem] leading-relaxed text-(--color-ink-soft)">
+                <div class="tl-role-body px-4 pb-3">
+                <div class="prose-tight text-[0.875rem] leading-relaxed text-(--color-ink-soft)">
                   <Content />
                 </div>
 
-                <ul class="mt-2.5 flex flex-wrap gap-x-2 gap-y-1" aria-label="Technologies">
-                  {entry.data.tech.map((slug, i) => (
-                    <li class="font-mono text-[0.6875rem] tracking-wide text-(--color-ink-faint)">
-                      {i > 0 && (
-                        <span class="mr-2 text-(--color-rule)" aria-hidden="true">
-                          ·
-                        </span>
-                      )}
-                      {techName(slug)}
-                    </li>
+                {/* Derived in lib/roleTech.ts from the role and its overlapping
+                    projects. Folded, each row shows only what fits on its first
+                    line; the script below measures that, so without JS the full
+                    list shows. */}
+                <dl class="role-tech" aria-label="Technologies" data-role-tech>
+                  {tech.map((group) => (
+                    <div class="role-tech-row">
+                      <dt>{group.label}</dt>
+                      <dd>
+                        <ul>
+                          {group.chips.map((chip) => (
+                            <li>{chip.name}</li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
                   ))}
-                </ul>
+                </dl>
+                </div>
+
+                {/* Outside the scrolling body, so the button stays at the bottom
+                    of the card. Revealed by the script only when something is
+                    actually folded away. */}
+                <div class="tl-role-foot hidden px-4 pb-3" data-role-tech-foot>
+                  <button type="button" class="role-tech-more" aria-expanded="false" data-role-tech-more>
+                    Show more
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -276,9 +299,9 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
               <div class="min-w-0 flex-1 sm:max-w-[60%] sm:flex-none">
                 <h3 class="entry-title leading-snug font-semibold">
-                  {entry.data.repo ? (
+                  {entry.data.repo || entry.data.pdf ? (
                     <a
-                      href={entry.data.repo}
+                      href={entry.data.repo ?? entry.data.pdf}
                       class="underline decoration-(--color-rule) decoration-2 underline-offset-4 transition-colors hover:decoration-(--color-accent)"
                       rel="noopener"
                     >
@@ -394,9 +417,6 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
     }
   </div>
 
-  <p class="tl-hint mt-4 text-xs text-(--color-ink-faint)">
-    {projectCount} projects · roles shown as bars spanning their dates
-  </p>
 </section>
 
 <script>
@@ -427,5 +447,55 @@ const eagerImagesId = items.find((item) => item.kind === 'project' && item.entry
     scroller.addEventListener('scroll', update, { passive: true });
     new ResizeObserver(update).observe(scroller);
     update();
+  }
+
+  // A role card's technology rows fold to their first line. Which names fit
+  // depends on the card's width, so it is measured here, and again whenever
+  // the card is resized. The list ships unfolded, so without JS nothing is lost.
+  for (const foot of document.querySelectorAll<HTMLElement>('[data-role-tech-foot]')) {
+    const card = foot.closest<HTMLElement>('.tl-role-card');
+    const list = card?.querySelector<HTMLElement>('[data-role-tech]');
+    const button = foot.querySelector<HTMLButtonElement>('[data-role-tech-more]');
+    if (!card || !list || !button) continue;
+
+    let folded = true;
+
+    const update = () => {
+      list.dataset.folded = String(folded);
+      let hidden = 0;
+      for (const row of list.querySelectorAll('ul')) {
+        const items = [...row.querySelectorAll('li')];
+        const firstLine = items[0]?.offsetTop ?? 0;
+        // Anything starting below the first item has wrapped to a later line.
+        const onFirstLine = items.filter((li) => li.offsetTop <= firstLine + 1);
+        hidden += items.length - onFirstLine.length;
+        items.forEach((li) => li.removeAttribute('data-line-end'));
+        if (onFirstLine.length < items.length) onFirstLine.at(-1)?.setAttribute('data-line-end', '');
+      }
+      // Measured folded; unfolded, the count is kept for the button's next label.
+      if (folded) button.dataset.hidden = String(hidden);
+      const count = Number(button.dataset.hidden ?? 0);
+      foot.classList.toggle('hidden', count === 0);
+      button.textContent = folded ? `Show ${count} more` : 'Show less';
+      button.setAttribute('aria-expanded', String(!folded));
+    };
+
+    button.addEventListener('click', () => {
+      folded = !folded;
+      update();
+    });
+    // Only a change of width can change what fits; folding changes the height,
+    // which must not set this off again.
+    let width = -1;
+    new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width === width) return;
+      width = entry.contentRect.width;
+      // Re-measure in the folded state, so the count is right for any width.
+      const wasFolded = folded;
+      folded = true;
+      update();
+      folded = wasFolded;
+      update();
+    }).observe(list);
   }
 </script>

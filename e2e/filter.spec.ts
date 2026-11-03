@@ -258,19 +258,10 @@ test('a filtered phone hides the hints that describe the unfiltered timeline', a
   await expect(hints.first()).toBeVisible();
 
   await chip(page, 'react').click();
-  // "each role, followed by what I built" and "roles shown as bars" are both
-  // false once the roles are gone from the screen.
+  // "Each role, followed by what I built" is false once the roles are gone
+  // from the screen.
   const n = await hints.count();
   for (let i = 0; i < n; i += 1) await expect(hints.nth(i)).toBeHidden();
-});
-
-test('a wide screen keeps its hints while filtering, because the bars are still there', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/');
-  await chip(page, 'react').click();
-  await expect(page.locator('.tl-hint').last()).toBeVisible();
 });
 
 

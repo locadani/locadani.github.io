@@ -11,18 +11,28 @@
 ---
 
 <dialog id="lightbox" class="lightbox" aria-label="Full-size image" tabindex="-1">
-  <button type="button" class="lightbox-close" data-lightbox-close aria-label="Close">✕</button>
   <div class="lightbox-stage">
+    <!-- Drawn icons, not ‹ › characters: a text glyph sits on its baseline and
+         never lands in the middle of the round hover background. -->
     <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Previous image">
-      ‹
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" /></svg>
     </button>
-    <div class="lightbox-panel">
-      <img data-lightbox-img alt="" />
-      <p class="lightbox-caption" data-lightbox-caption></p>
-      <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
+    <!-- The frame exists to anchor the close button on the card's corner. It
+         can't live inside the panel, whose overflow: hidden would clip it. -->
+    <div class="lightbox-frame">
+      <button type="button" class="lightbox-close" data-lightbox-close aria-label="Close">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+      </button>
+      <div class="lightbox-panel">
+        <div class="lightbox-viewport" data-lightbox-viewport>
+          <img data-lightbox-img alt="" />
+        </div>
+        <p class="lightbox-caption" data-lightbox-caption></p>
+        <p class="lightbox-index" data-lightbox-index aria-live="polite"></p>
+      </div>
     </div>
     <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Next image">
-      ›
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" /></svg>
     </button>
   </div>
 </dialog>
@@ -35,8 +45,77 @@
   const nextBtn = dialog?.querySelector<HTMLButtonElement>('[data-lightbox-next]');
   const captionEl = dialog?.querySelector<HTMLElement>('[data-lightbox-caption]');
   const indexEl = dialog?.querySelector<HTMLElement>('[data-lightbox-index]');
+  const viewport = dialog?.querySelector<HTMLElement>('[data-lightbox-viewport]');
 
-  if (dialog && img && closeBtn && prevBtn && nextBtn && captionEl && indexEl) {
+  if (dialog && img && closeBtn && prevBtn && nextBtn && captionEl && indexEl && viewport) {
+    // Zoom: a click on the image blows it up inside a window the size it was
+    // shown at, so the card and the buttons around it don't move. Drag (or
+    // scroll, or swipe) to look around; a click without a drag zooms back out.
+    let zoomed = false;
+    let drag: { x: number; y: number; left: number; top: number; moved: boolean } | null = null;
+    // Set when a drag ends, so the click the browser fires next doesn't unzoom.
+    let suppressClick = false;
+
+    const unzoom = () => {
+      zoomed = false;
+      viewport.classList.remove('is-zoomed');
+      viewport.style.width = viewport.style.height = img.style.width = '';
+    };
+
+    const zoomAt = (clientX: number, clientY: number) => {
+      const r = img.getBoundingClientRect();
+      // At least double. Raster screenshots go further when they have the
+      // pixels for it; the diagrams are vector and stay sharp at any size.
+      const scale = Math.min(4, Math.max(2, img.naturalWidth / r.width || 0));
+      zoomed = true;
+      viewport.style.width = `${r.width}px`;
+      viewport.style.height = `${r.height}px`;
+      viewport.classList.add('is-zoomed');
+      img.style.width = `${r.width * scale}px`;
+      // Keep the point that was clicked under the pointer.
+      const x = clientX - r.left;
+      const y = clientY - r.top;
+      viewport.scrollLeft = x * scale - x;
+      viewport.scrollTop = y * scale - y;
+    };
+
+    // On the viewport, not the image: once a press is captured for dragging,
+    // the browser delivers the following click to the viewport.
+    viewport.addEventListener('click', (e) => {
+      if (suppressClick) {
+        suppressClick = false;
+        return;
+      }
+      if (zoomed) unzoom();
+      else zoomAt(e.clientX, e.clientY);
+    });
+
+    // Mouse and pen drag to pan. Touch is left to the browser, which already
+    // scrolls the zoomed window with a swipe.
+    viewport.addEventListener('pointerdown', (e) => {
+      suppressClick = false;
+      if (!zoomed || e.pointerType === 'touch' || e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, left: viewport.scrollLeft, top: viewport.scrollTop, moved: false };
+      viewport.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    viewport.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      viewport.scrollLeft = drag.left - dx;
+      viewport.scrollTop = drag.top - dy;
+      viewport.classList.toggle('is-dragging', drag.moved);
+    });
+    const endDrag = () => {
+      if (drag?.moved) suppressClick = true;
+      drag = null;
+      viewport.classList.remove('is-dragging');
+    };
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+
     // The full set of images in the currently-open group, and where we are
     // within it, both re-derived from the DOM each time a trigger opens
     // the dialog, so they always match what's actually on the page.
@@ -44,6 +123,7 @@
     let current = 0;
 
     const show = (index: number) => {
+      unzoom();
       current = index;
       const item = items[current];
       // Tall images get their caption beside them on wide screens (see
@@ -86,6 +166,7 @@
     prevBtn.addEventListener('click', () => step(-1));
     nextBtn.addEventListener('click', () => step(1));
     closeBtn.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', unzoom);
 
     dialog.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft' && !prevBtn.hidden) step(-1);

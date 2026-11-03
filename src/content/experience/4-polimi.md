@@ -10,4 +10,4 @@ tech: [rust, java, cpp, python]
 
 - Master's thesis: a state-of-the-art analysis of GPU computing with Rust
 - Erasmus exchange at Universität Tübingen, Germany (Mar – Aug 2022)
-- Taught in English
+- Master's taught in English

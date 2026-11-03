@@ -55,6 +55,12 @@ const projects = defineCollection({
         end: month.optional(),
         tech,
         repo: z.url().optional(),
+        /** A document served from `public/` (e.g. `/thesis.pdf`); the title links
+            to it when there is no repo. */
+        pdf: z
+          .string()
+          .regex(/^\/[\w.-]+\.pdf$/, 'expected a path in public/, e.g. /thesis.pdf')
+          .optional(),
         /** Screenshots or diagrams, colocated with the entry (e.g. `./foo.svg`). */
         images: z.array(z.object({ src: image(), alt: z.string() })).optional(),
         /** Show each image's alt text as a caption in the lightbox. Turn off
