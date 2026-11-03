@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import ThemeToggle from './ThemeToggle.astro';
 
 const link =
   'underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:text-(--color-accent) hover:decoration-(--color-accent)';
@@ -21,6 +22,7 @@ const link =
       <a href="#timeline" class={`hidden sm:inline ${link}`}>Projects</a>
       <a href={site.links.github} class={link} rel="me noopener">GitHub</a>
       <a href={site.links.linkedin} class={link} rel="me noopener">LinkedIn</a>
+      <ThemeToggle class="-mr-1.5" />
     </div>
   </nav>
 </header>

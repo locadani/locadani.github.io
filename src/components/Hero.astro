@@ -1,8 +1,13 @@
 ---
 import { site } from '../data/site';
+import ThemeToggle from './ThemeToggle.astro';
 ---
 
-<header class="mx-auto max-w-6xl px-6 pt-8 pb-6 sm:pt-10">
+<header class="relative mx-auto max-w-6xl px-6 pt-12 pb-6 sm:pt-10">
+  {/* The sliding header has its own; this one serves the top of the page,
+      where that header is hidden. */}
+  <ThemeToggle class="no-print absolute top-3 right-4.5 sm:top-4" />
+
   <h1
     class="font-serif text-5xl leading-[1.05] font-medium tracking-tight text-balance sm:text-6xl"
   >

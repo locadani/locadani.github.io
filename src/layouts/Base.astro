@@ -40,6 +40,14 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* Re-applies a theme picked with the toggle before anything paints, so a
+        dark-mode reader of a light-pinned page (or vice versa) sees no flash. */}
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
   </head>
   <body>

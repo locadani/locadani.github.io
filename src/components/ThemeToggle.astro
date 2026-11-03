@@ -1,0 +1,84 @@
+---
+/* Light/dark switch. Used twice (hero and sliding header), so every instance
+   is wired by the one script below. The page follows the system theme until
+   this is clicked; the choice is stored in localStorage and re-applied before
+   first paint by the inline script in Base.astro. Picking the theme the
+   system already shows clears the override, so the page follows the system
+   again from then on. */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  class={`theme-toggle inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-(--color-ink-soft) transition-colors hover:bg-(--color-paper-sunk) hover:text-(--color-accent) ${className}`}
+  aria-label="Switch theme"
+  data-theme-toggle
+>
+  <svg
+    class="icon-moon h-4 w-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+  </svg>
+  <svg
+    class="icon-sun h-4 w-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <path
+      d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+    ></path>
+  </svg>
+</button>
+
+<script>
+  const root = document.documentElement;
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+
+  const system = () => (systemDark.matches ? 'dark' : 'light');
+  const current = () => (root.dataset.theme === 'dark' || root.dataset.theme === 'light' ? root.dataset.theme : system());
+
+  function label() {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    for (const b of buttons) b.setAttribute('aria-label', `Switch to ${next} theme`);
+  }
+
+  for (const b of buttons) {
+    b.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      try {
+        if (next === system()) {
+          delete root.dataset.theme;
+          localStorage.removeItem('theme');
+        } else {
+          root.dataset.theme = next;
+          localStorage.setItem('theme', next);
+        }
+      } catch {
+        // Storage blocked: the switch still applies for this visit.
+        if (next === system()) delete root.dataset.theme;
+        else root.dataset.theme = next;
+      }
+      label();
+    });
+  }
+
+  systemDark.addEventListener('change', label);
+  label();
+</script>

@@ -5,21 +5,28 @@
   --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Light editorial palette: warm paper, near-black ink, one accent. */
-  --color-paper: oklch(99.2% 0.003 85);
-  --color-paper-sunk: oklch(97.4% 0.005 85);
-  --color-ink: oklch(23% 0.012 265);
-  --color-ink-soft: oklch(45% 0.012 265);
-  --color-ink-faint: oklch(63% 0.01 265);
-  --color-rule: oklch(90.5% 0.006 265);
-  --color-rule-soft: oklch(94.5% 0.005 265);
-  --color-accent: oklch(48% 0.15 258);
-  --color-accent-soft: oklch(95.5% 0.028 258);
+  /* Editorial palette: warm paper, near-black ink, one accent. Each token is
+     light-dark(light, dark); which half applies follows `color-scheme` below,
+     so the system setting works without JavaScript and the toggle only has to
+     pin it. */
+  --color-paper: light-dark(oklch(99.2% 0.003 85), oklch(18% 0.006 265));
+  --color-paper-sunk: light-dark(oklch(97.4% 0.005 85), oklch(22% 0.007 265));
+  --color-ink: light-dark(oklch(23% 0.012 265), oklch(93% 0.005 85));
+  --color-ink-soft: light-dark(oklch(45% 0.012 265), oklch(77% 0.008 265));
+  --color-ink-faint: light-dark(oklch(63% 0.01 265), oklch(63% 0.01 265));
+  --color-rule: light-dark(oklch(90.5% 0.006 265), oklch(31% 0.008 265));
+  --color-rule-soft: light-dark(oklch(94.5% 0.005 265), oklch(26% 0.007 265));
+  --color-accent: light-dark(oklch(48% 0.15 258), oklch(74% 0.12 258));
+  --color-accent-soft: light-dark(oklch(95.5% 0.028 258), oklch(34% 0.07 258));
 }
 
 /* Height of the sticky site header; anything else that sticks sits below it. */
 :root {
   --header-h: 3.75rem;
+
+  /* Follow the system unless the toggle (ThemeToggle.astro) has pinned a
+     theme with data-theme, set before first paint in Base.astro. */
+  color-scheme: light dark;
 
   /* One colour per role, assigned newest first and cycled (see Timeline.astro).
      Same lightness and chroma, so no job looks louder than another. */
@@ -33,6 +40,32 @@
   --role-tint: 20%;
 }
 
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* The toggle shows what a click switches to: a moon on light, a sun on dark. */
+.theme-toggle .icon-sun {
+  display: none;
+}
+:root[data-theme='dark'] .theme-toggle .icon-sun {
+  display: block;
+}
+:root[data-theme='dark'] .theme-toggle .icon-moon {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-toggle .icon-sun {
+    display: block;
+  }
+  :root:not([data-theme='light']) .theme-toggle .icon-moon {
+    display: none;
+  }
+}
+
 /* A role card is tinted with its role's colour, the same colour as its rail,
    so card and rail read as one object. Opaque on purpose: the card is sticky
    and projects scroll past behind it. Mixed in oklab, not oklch: oklch would
@@ -40,8 +73,9 @@
 .tl-role-card {
   background: color-mix(in oklab, var(--role) var(--role-tint), var(--color-paper));
   border-color: color-mix(in oklab, var(--role) calc(var(--role-tint) + 15%), var(--color-paper));
-  /* The faint grey is too light on the tint; darken it within the card only. */
-  --color-ink-faint: oklch(47% 0.012 265);
+  /* The faint grey is too faint on the tint; push it toward the ink within
+     the card only. */
+  --color-ink-faint: light-dark(oklch(47% 0.012 265), oklch(72% 0.01 265));
 }
 
 /* The technology recap under a role's bullets: one labelled row per kind. */
